@@ -1,0 +1,55 @@
+global:
+  oauth-proxy:
+    client-id:
+    client-secret:
+    cookie-secret:
+  email: team@ouzi.dev
+  gcloud:
+    project: ouzidev-testinfra-252513 
+    terraform_gke_svc_account_key:
+    certmanager_gke_svc_account_key:
+    prowbucket_svc_account_key: 
+  aws:
+    terraform_user_access_key_id:
+    terraform_user_secret_access_key: 
+  github:
+    org: ouzi-dev
+    bot:
+      username: ouzibot
+      token:
+      ssh_key:
+  docker:
+    config: 
+  prow:
+    baseurl: prow.test-infra.ouzi.io
+    bucket_svc_account_key: 
+    webhook_hmac_token:
+    oauth_config: 
+    cookie_secret: 
+    bucket_name: 
+  slack:
+    token:  
+
+  cert-manager:
+    #gke_svc_account_key: base64 of the account key  
+external-dns:
+  ## K8s resources type to be observed for new DNS entries by ExternalDNS 
+  sources:
+  - service
+  - ingress
+  ## DNS provider where the DNS records will be created. Available providers are:
+  ## - aws, azure, cloudflare, coredns, designate, digitalocoean, google, infoblox, rfc2136
+  provider: google
+  google:
+   project: ouzidev-testinfra-252513
+   
+## nginx configuration
+## Ref: https://github.com/kubernetes/ingress/blob/master/controllers/nginx/configuration.md
+##
+nginx-ingress:
+  controller:
+    service:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
+
+

@@ -1,0 +1,65 @@
+{
+  "name": "prow-helm-chart",
+  "description": "__A Helm chart for Prow__",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ouzi-dev/prow-helm-chart.git"
+  },
+  "author": "aouzounis",
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^6.3.0",
+    "@semantic-release/exec": "^3.3.2",
+    "@semantic-release/github": "^5.2.10",
+    "@semantic-release/release-notes-generator": "^7.1.4",
+    "fstream": "^1.0.12",
+    "semantic-release": "^16.0.0-beta.24",
+    "tar": "^4.4.9",
+    "env-ci": "4.1.1"
+  },
+  "release": {
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules": [
+            {
+              "type": "fix",
+              "release": "patch"
+            },
+            {
+              "type": "refactor",
+              "release": "patch"
+            },
+            {
+              "type": "feat",
+              "release": "minor"
+            },
+            {
+              "type": "major",
+              "release": "major"
+            }
+          ]
+        }
+      ],
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/github",
+        {
+          "successComment": "This ${issue.pull_request ? 'pull request' : 'issue'} is included in version ${nextRelease.version}",
+          "failComment": "The release from ${branch} had failed due to the following errors:\n- ${errors.map(err => err.message).join('\\n- ')}"
+        }
+      ]
+    ],
+    "preset": "angular",
+    "branch": "master",
+    "tagFormat": "v${version}",
+    "ci": false
+  },
+  "version": "0.0.0-development",
+  "scripts": {
+    "semantic-release": "semantic-release"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
