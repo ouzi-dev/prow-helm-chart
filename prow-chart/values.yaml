@@ -1,79 +1,37 @@
-email: team@ouzi.dev
-baseurl: prow.test-infra.ouzi.io
-
-storage:
-  provisioner: kubernetes.io/gce-pd
-
-gcloud:
-  project: ouzidev-testinfra-252513 
-
-github:
-  org: ouzi-dev
-  bot:
-    username: ouzibot
-
-secrets:
-  slack:
-    token: 
+global:
+  oauth-proxy:
+    client-id:
+    client-secret:
+    cookie-secret:
+  email: team@ouzi.dev
+  gcloud:
+    project: ouzidev-testinfra-252513 
+    terraform_gke_svc_account_key:
+    certmanager_gke_svc_account_key:
+    prowbucket_svc_account_key: 
+  aws:
+    terraform_user_access_key_id:
+    terraform_user_secret_access_key: 
   github:
-    token: 
-    sshkey:
+    org: ouzi-dev
+    bot:
+      username: ouzibot
+      token:
+      ssh_key:
+  docker:
+    config: 
   prow:
-    hmactoken: 
-    oauthconfig:
-    bucketgcscredentials:
-  oauthproxy:
-    clientid: 
-    clientsecret: 
+    baseurl: prow.test-infra.ouzi.io
+    bucket_svc_account_key: 
+    webhook_hmac_token:
+    oauth_config: 
+    cookie_secret: 
+    bucket_name: 
+  slack:
+    token:  
 
-prowbucketname: ouzidev-testinfra-252513-prow-artefacts
-
-oauthproxy:
-  image: quay.io/pusher/oauth2_proxy:v3.1.0
-
-hook:
-  image: gcr.io/k8s-prow/hook:v20191017-af5797562
-  replicas: 1
-plank:
-  image: gcr.io/k8s-prow/plank:v20191017-af5797562
-sinker:
-  image: gcr.io/k8s-prow/sinker:v20191017-af5797562
-  replicas: 1
-deck:
-  image: gcr.io/k8s-prow/deck:v20191017-af5797562
-  replicas: 1
-horologium:
-  image: gcr.io/k8s-prow/horologium:v20191017-af5797562
-tide:
-  image: gcr.io/k8s-prow/tide:v20191017-af5797562
-statusreconciler:
-  image: gcr.io/k8s-prow/status-reconciler:v20191017-af5797562
-  replicas: 1
-needsrebase:
-  image: gcr.io/k8s-prow/needs-rebase:v20190517-95ef25d87
-branchprotector:
-  image: gcr.io/k8s-prow/branchprotector:v20190625-9f02db3fe
-  schedule: 12 * * * * # Every hour at 12 minutes past the hour
-crier:
-  image: gcr.io/k8s-prow/crier:v20190625-9f02db3fe
-  replicas: 1
-labelsync:
-  image: gcr.io/k8s-prow/label_sync:v20190625-9f02db3fe
-  schedule: 0 5 * * * # Every day at 5AM
-
-pushgateway:
-  image: prom/pushgateway:v0.4.0
-  replicas: 1
-  proxy:
-    image: nginx:1
-    replicas: 1
-ghproxy:
-  image: gcr.io/k8s-prow/ghproxy:v20190625-9f02db3fe
-  replicas: 1
-  cachesizeGB: 19
-
-## SUBCHART Configuration
-## Unfortunately some duplication must occur as we can remap values to other values in helm
+  cert-manager:
+    #gke_svc_account_key: base64 of the account key  
 external-dns:
   ## K8s resources type to be observed for new DNS entries by ExternalDNS 
   sources:
@@ -88,8 +46,10 @@ external-dns:
 ## nginx configuration
 ## Ref: https://github.com/kubernetes/ingress/blob/master/controllers/nginx/configuration.md
 ##
-nginxingress:
+nginx-ingress:
   controller:
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
+
+

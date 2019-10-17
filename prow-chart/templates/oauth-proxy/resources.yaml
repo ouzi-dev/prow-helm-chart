@@ -5,9 +5,15 @@ metadata:
   name: github-oauth-secret
 type: Opaque
 data:
+<<<<<<< HEAD
   client-id: {{ .Values.secrets.oauthproxy.clientid }}
   client-secret: {{ .Values.secrets.oauthproxy.clientsecret }}
   cookie-secret:  {{ randAlphaNum 20 | b64enc | quote }} 
+=======
+  client-id: {{ .global.oauth-proxy.client_id }}
+  client-secret: {{.global.oauth-proxy.client_secret }}
+  cookie-secret:  {{ .global.oauth-proxy.cookie_secret }}
+>>>>>>> feat: Initial commit
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -41,6 +47,10 @@ metadata:
   labels:
     k8s-app: oauth2-proxy
   name: oauth2-proxy
+<<<<<<< HEAD
+=======
+  namespace: oauth2-proxy
+>>>>>>> feat: Initial commit
 spec:
   replicas: 1
   selector:
