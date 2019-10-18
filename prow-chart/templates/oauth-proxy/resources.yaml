@@ -41,7 +41,6 @@ metadata:
   labels:
     k8s-app: oauth2-proxy
   name: oauth2-proxy
-  namespace: oauth2-proxy
 spec:
   replicas: 1
   selector:
@@ -139,7 +138,7 @@ metadata:
   name: oauth2-proxy
 spec:
   rules:
-  - host: {{ .global.prow.baseurl }}
+  - host: {{ .Values.prow.baseurl }}
     http:
       paths:
       - backend:
@@ -148,5 +147,5 @@ spec:
         path: /oauth2
   tls:
     - hosts:
-      - {{ .global.prow.baseurl }}
+      - {{ .Values.prow.baseurl }}
       secretName: prow-tls

@@ -1,45 +1,13 @@
-# ---
-# apiVersion: v1
-# data:
-#   config.yaml: |-
-#     prowjob_namespace: prow
-#     pod_namespace: prow-test-pods
-# kind: ConfigMap
-# metadata:
-#   name: config
-#   namespace: prow
-# ---
-# apiVersion: v1
-# data:
-#   plugins.yaml: |-
-#     plugins:
-#       {{.github.org}}/test-infra:
-#       - config-updater
-#     config_updater:
-#       maps:
-#         prow/config.yaml:
-#           name: config
-#         prow/plugins.yaml:
-#           name: plugins
-#         config/jobs/**/*.yaml:
-#           name: job-config
-#           gzip: true
-# kind: ConfigMap
-# metadata:
-#   name: plugins
-#   namespace: prow
 ---
 apiVersion: v1
 data:
 kind: ConfigMap
 metadata:
   name: job-config
-  namespace: prow
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  namespace: prow
   name: gce-ssd-retain
 provisioner: kubernetes.io/gce-pd
 parameters:
@@ -49,7 +17,6 @@ reclaimPolicy: Retain
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: prow
   labels:
     app: ghproxy
   name: ghproxy
@@ -69,20 +36,10 @@ spec:
   #    created with: `kubectl create -f prow/cluster/gce-ssd-retain_storageclass.yaml
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: prow-test-pods
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: prow
----  
-apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: prow
-  namespace: prow-test-pods
+  name: prow-test-pods
+  namespace: {{ .Release.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -95,122 +52,93 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: prow
-    namespace: prow-test-pods
+    namespace: {{ .Release.namespace }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: gcs-credentials
-  namespace: prow
 type: Opaque
 data:
-  service-account.json: {{ .global.gcloud.prowbucket_svc_account_key }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: gcs-credentials
-  namespace: prow-test-pods
-type: Opaque
-data:
-  service-account.json: {{ .global.gcloud.prowbucket_svc_account_key }}
+  service-account.json: {{ .Values.gcloud.prowbucket_svc_account_key }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: hmac-token
-  namespace: prow
 type: Opaque
 data:
-  hmac: {{ .global.prow.webhook_hmac_token }}
+  hmac: {{ .Values.prow.webhook_hmac_token }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: slack-token
-  namespace: prow
 type: Opaque
 data:
-  token: {{ .global.slack.token }}
+  token: {{ .Values.slack.token }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: oauth-token
-  namespace: prow
 type: Opaque
 data:
-  oauth: {{ .global.github.bot.token }}
+  oauth: {{ .Values.github.bot.token }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: github-token
-  namespace: prow-test-pods
 type: Opaque
 data:
-  oauth: {{ .global.github.bot.token }}
+  oauth: {{ .Values.github.bot.token }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: github-ssh-key
-  namespace: prow-test-pods
 type: Opaque
 data:
-  key: { .global{.github.bot.ssh_key }}  
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: github-ssh-key
-  namespace: prow
-type: Opaque
-data:
-  key: {{ .global.github.bot.ssh_key }}  
+  key: {{} .Values.github.bot.ssh_key }}  
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: github-oauth-config
-  namespace: prow
 type: Opaque
 data:
-  secret: {{ .global.prow.oauth_config }}
+  secret: {{ .Values.prow.oauth_config }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: cookie
-  namespace: prow
 type: Opaque
 data:
-  secret: {{ .global.prow.cookie_secret }}  
+  secret: {{ .Values.prow.cookie_secret }}  
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: terraform-google-service-account
-  namespace: prow-test-pods
 type: Opaque
 data:
-  key.json: {{ .global.gcloud.terraform_gke_svc_account_key }}  
+  key.json: {{ .Values.gcloud.terraform_gke_svc_account_key }}  
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: terraform-aws-service-account
-  namespace: prow-test-pods
 type: Opaque
 data:
-  access_key_id: {{ .global.aws.terraform_user_access_key_id }}  
-  secret_access_key: {{ .global.aws.terraform_user_secret_access_key }}
+  access_key_id: {{ .Values.aws.terraform_user_access_key_id }}  
+  secret_access_key: {{ .Values.aws.terraform_user_secret_access_key }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: github-bot-pull-push-secret
-  namespace: prow-test-pods
 data:
   .dockerconfigjson: {{ .global.docker.config }}
 type: kubernetes.io/dockerconfigjson
@@ -218,7 +146,6 @@ type: kubernetes.io/dockerconfigjson
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: prow
   name: label-config
 data:
   labels.yaml: |-

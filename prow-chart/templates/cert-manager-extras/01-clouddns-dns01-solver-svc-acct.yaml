@@ -5,4 +5,4 @@ metadata:
   name: clouddns-dns01-solver-svc-acct
 type: Opaque
 data:
-    key.json: {{ .global.gcloud.certmanager_gke_svc_account_key }}
+    key.json: {{ .Values.gcloud.certmanager_gke_svc_account_key }}

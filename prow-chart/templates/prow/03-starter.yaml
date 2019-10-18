@@ -93,7 +93,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: hook
   labels:
     app: hook
@@ -113,7 +112,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: hook
-        image: {{ .global.prow.image.hook }}
+        image: {{ quote .Values.prow.image.hook }}
         imagePullPolicy: IfNotPresent
         args:
         - --slack-token-file=/etc/slack/token
@@ -182,7 +181,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: hook
 spec:
   selector:
@@ -197,7 +195,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: plank
   labels:
     app: plank
@@ -213,7 +210,7 @@ spec:
       serviceAccountName: "plank"
       containers:
       - name: plank
-        image: {{ .global.prow.image.plank }}
+        image: {{ quote .Values.prow.image.plank }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -248,7 +245,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: plank
 spec:
   selector:
@@ -261,7 +257,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: sinker
   labels:
     app: sinker
@@ -275,7 +270,7 @@ spec:
       serviceAccountName: "sinker"
       containers:
       - name: sinker
-        image: {{ .global.prow.image.sinker }}
+        image: {{ quote .Values.prow.image.sinker }}
         args:
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
@@ -301,7 +296,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: deck
   labels:
     app: deck
@@ -321,12 +315,12 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: deck
-        image: {{ .global.prow.image.deck }}
+        image: {{ quote .Values.prow.image.deck }}
         args:
         - --config-path=/etc/config/config.yaml
         - --tide-url=http://tide/
         - --hook-url=http://hook:8888/plugin-help
-        - --redirect-http-to={{ .global.prow.baseurl }}
+        - --redirect-http-to={{ quote .Values.prow.baseurl }}
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
         - --oauth-url=/github-login
@@ -379,7 +373,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: deck
 spec:
   selector:
@@ -395,7 +388,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: horologium
   labels:
     app: horologium
@@ -412,7 +404,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: horologium
-        image: {{ .global.prow.image.horologium }}
+        image: {{ quote .Values.prow.image.horologium }}
         args:
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
@@ -435,7 +427,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: tide
   labels:
     app: tide
@@ -451,15 +442,15 @@ spec:
       serviceAccountName: "tide"
       containers:
       - name: tide
-        image: {{ .global.prow.image.tide }}
+        image: {{ quote .Values.prow.image.tide }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=http://ghproxy
 #        - --github-endpoint=https://api.github.com
         - --gcs-credentials-file=/etc/service-account/service-account.json
-        - --history-uri=gs://{{ .global.prow.bucket_name }}/tide-history.json
-        - --status-path=gs://{{ .global.prow.bucket_name }}/tide-status-checkpoint.yaml
+        - --history-uri=gs://{{ .Values.prow.bucket_name }}/tide-history.json
+        - --status-path=gs://{{ .Values.prow.bucket_name }}/tide-status-checkpoint.yaml
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
         ports:
@@ -497,7 +488,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: tide
 spec:
   selector:
@@ -514,7 +504,6 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: statusreconciler
-  namespace: prow
   labels:
     app: statusreconciler
 spec:
@@ -528,7 +517,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: statusreconciler
-        image: {{ .global.prow.image.status-reconciler }}
+        image: {{ quote .Values.prow.image.status-reconciler }}
         args:
         - --dry-run=false
         - --continue-on-error=true
@@ -566,13 +555,11 @@ spec:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "deck"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "deck"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -581,25 +568,10 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "deck"
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "deck"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: "deck"
-subjects:
-- kind: ServiceAccount
-  name: "deck"
-  namespace: prow
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "deck"
 rules:
   - apiGroups:
@@ -609,13 +581,6 @@ rules:
     verbs:
       - get
       - list
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "deck"
-rules:
   - apiGroups:
       - ""
     resources:
@@ -626,13 +591,11 @@ rules:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "horologium"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "horologium"
 rules:
   - apiGroups:
@@ -646,7 +609,6 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "horologium"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -659,13 +621,11 @@ subjects:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "plank"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "plank"
 rules:
   - apiGroups:
@@ -677,13 +637,6 @@ rules:
       - create
       - list
       - update
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "plank"
-rules:
   - apiGroups:
       - ""
     resources:
@@ -691,12 +644,11 @@ rules:
     verbs:
       - create
       - delete
-      - list
+      - list 
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "plank"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -705,31 +657,15 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "plank"
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "plank"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: "plank"
-subjects:
-- kind: ServiceAccount
-  name: "plank"
-  namespace: prow
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "sinker"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "sinker"
 rules:
   - apiGroups:
@@ -739,13 +675,6 @@ rules:
     verbs:
       - delete
       - list
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "sinker"
-rules:
   - apiGroups:
       - ""
     resources:
@@ -757,7 +686,6 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "sinker"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -766,31 +694,15 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "sinker"
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  namespace: prow-test-pods
-  name: "sinker"
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: "sinker"
-subjects:
-- kind: ServiceAccount
-  name: "sinker"
-  namespace: prow
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "hook"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "hook"
 rules:
   - apiGroups:
@@ -812,7 +724,6 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "hook"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -825,13 +736,11 @@ subjects:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "tide"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "tide"
 rules:
   - apiGroups:
@@ -845,7 +754,6 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "tide"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -858,13 +766,11 @@ subjects:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "statusreconciler"
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "statusreconciler"
 rules:
   - apiGroups:
@@ -877,7 +783,6 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: prow
   name: "statusreconciler"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -890,7 +795,6 @@ subjects:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: needs-rebase
   labels:
     app: needs-rebase
@@ -904,7 +808,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: needs-rebase
-        image: {{ .global.prow.image.needs-rebase }}
+        image: {{ quote .Values.prow.image.needs-rebase }}
         imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
@@ -937,7 +841,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: needs-rebase
 spec:
   selector:
@@ -951,7 +854,6 @@ spec:
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
- namespace: prow
  name: branchprotector
 spec:
  schedule: "12 * * * *"  # Every hour at 12 minutes past the hour
@@ -965,7 +867,7 @@ spec:
        spec:
          containers:
          - name: branchprotector
-           image: {{ .global.prow.image.branch-protector }}
+           image: {{ quote .Values.prow.image.branch-protector }}
            args:
            - --config-path=/etc/config/config.yaml
            - --job-config-path=/etc/job-config
@@ -997,7 +899,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: pushgateway
   labels:
     app: pushgateway
@@ -1018,7 +919,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: pushgateway
   labels:
     app: pushgateway
@@ -1034,7 +934,6 @@ spec:
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  namespace: prow
   name: pushgateway-proxy-config
 data:
   nginx.conf: |-
@@ -1061,7 +960,6 @@ data:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: pushgateway-proxy
   labels:
     app: pushgateway-proxy
@@ -1089,7 +987,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   name: pushgateway-external
   labels:
     app: pushgateway-external
@@ -1105,7 +1002,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: prow
   name: ghproxy
   labels:
     app: ghproxy
@@ -1139,7 +1035,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prow
   labels:
     app: ghproxy
   name: ghproxy
@@ -1159,12 +1054,10 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: "crier"
-  namespace: prow
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  # "namespace" omitted since ClusterRoles are not namespaced
   name: crier
 rules:
 - apiGroups:
@@ -1181,7 +1074,6 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: "crier"
-  namespace: "prow"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -1189,13 +1081,12 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "crier"
-  namespace: "prow"
+  namespace: {{ .Release.namespace }}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: crier
-  namespace: prow
   labels:
     app: crier
 spec:
@@ -1209,7 +1100,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: crier
-        image: {{ .global.prow.image.crier }}
+        image: {{ quote .Values.prow.image.crier }}
         args:
         - --github-workers=1
         - --slack-workers=1
@@ -1250,7 +1141,6 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: label-sync
-  namespace: prow
 spec:
   schedule: "0 5 * * *" 
   concurrencyPolicy: Forbid
@@ -1263,11 +1153,11 @@ spec:
         spec:
           containers:
             - name: label-sync
-              image: {{ .global.prow.image.label-sync }}
+              image: {{ quote .Values.prow.image.label-sync }}
               args:
               - --config=/etc/config/labels.yaml
               - --confirm=true
-              - --orgs={{.github.org}}
+              - --orgs={{ .Values.github.org }}
               - --token=/etc/github/oauth
               volumeMounts:
               - name: oauth
@@ -1295,10 +1185,9 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
     nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"    
   name: prow
-  namespace: prow
 spec:
   rules:
-  - host: {{ .global.prow.baseurl }}
+  - host: {{ quote .Values.prow.baseurl }}
     http:
       paths:
       - backend:
@@ -1307,7 +1196,7 @@ spec:
         path: /
   tls:
   - hosts:
-    - {{ .global.prow.baseurl }}
+    - {{ quote .Values.prow.baseurl }}
     secretName: prow-tls
 ---
 apiVersion: extensions/v1beta1
@@ -1318,10 +1207,9 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: nginx
   name: hook
-  namespace: prow
 spec:
   rules:
-  - host: {{ .global.prow.baseurl }}
+  - host: {{ quote .Values.prow.baseurl }}
     http:
       paths:
       - backend:
@@ -1330,5 +1218,5 @@ spec:
         path: /hook
   tls:
   - hosts:
-    - {{ .global.prow.baseurl }}
+    - {{ quote .Values.prow.baseurl }}
     secretName: prow-tls    

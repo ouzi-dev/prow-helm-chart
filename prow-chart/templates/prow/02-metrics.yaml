@@ -4,7 +4,6 @@ metadata:
   labels:
     app: prow
   name: prow
-  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -24,7 +23,6 @@ metadata:
   labels:
     app: deck
   name: deck
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
@@ -44,7 +42,6 @@ metadata:
   labels:
     app: ghproxy
   name: ghproxy
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
@@ -64,7 +61,6 @@ metadata:
   labels:
     app: hook
   name: hook
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
@@ -84,7 +80,6 @@ metadata:
   labels:
     app: plank
   name: plank
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
@@ -104,7 +99,6 @@ metadata:
   labels:
     app: sinker
   name: sinker
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
@@ -124,7 +118,6 @@ metadata:
   labels:
     app: tide
   name: tide
-  namespace: monitoring
 spec:
   endpoints:
     - interval: 30s
