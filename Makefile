@@ -15,3 +15,13 @@ validate:
 .PHONY: lint
 lint:
 	helm lint ./prow-chart	
+
+.PHONY: semantic-release
+semantic-release:
+	npm ci
+	npx semantic-release
+
+.PHONY: semantic-release-dry-run
+semantic-release-dry-run:
+	npm ci
+	npx semantic-release -d
