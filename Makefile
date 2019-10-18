@@ -1,6 +1,16 @@
+
+# does not work without explicitly specifying the api version
+# see: https://github.com/helm/helm/issues/6505 
 .PHONY: validate
 validate:
-	helm install prow --namespace prow --debug --dry-run ./prow-chart
+	helm template prow \
+	--namespace prow \
+	--debug \
+	-a apiregistration.k8s.io/v1beta1 \
+	-a cert-manager.io/v1alpha2 \
+	-a monitoring.coreos.com/v1 \
+	-a apiextensions.k8s.io/v1beta1 \
+	./prow-chart
 
 .PHONY: lint
 lint:
