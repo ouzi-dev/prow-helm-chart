@@ -95,10 +95,14 @@ spec:
           - --upstream=http://localhost/redirect/
           - --http-address=0.0.0.0:4180
 <<<<<<< HEAD
+<<<<<<< HEAD
           - --cookie-domain=.{{ .Values.baseurl }}
 =======
           - --cookie-domain=.{{ .Values.prow.baseurl }}
 >>>>>>> Template secrets
+=======
+          - --cookie-domain=.{{ .Values.baseurl }}
+>>>>>>> Pass linter
           - --footer=-
           # Register a new application
           # https://github.com/settings/applications/new
@@ -149,11 +153,7 @@ metadata:
   name: oauth2-proxy
 spec:
   rules:
-<<<<<<< HEAD
   - host: {{ .Values.baseurl }}
-=======
-  - host: {{ .Values.prow.baseurl }}
->>>>>>> Remove hardcorded namespaces
     http:
       paths:
       - backend:
@@ -162,9 +162,5 @@ spec:
         path: /oauth2
   tls:
     - hosts:
-<<<<<<< HEAD
       - {{ .Values.baseurl }}
-=======
-      - {{ .Values.prow.baseurl }}
->>>>>>> Remove hardcorded namespaces
       secretName: prow-tls
