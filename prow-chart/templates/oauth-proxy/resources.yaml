@@ -41,13 +41,6 @@ metadata:
   labels:
     k8s-app: oauth2-proxy
   name: oauth2-proxy
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  namespace: oauth2-proxy
->>>>>>> feat: Initial commit
-=======
->>>>>>> Remove hardcorded namespaces
 spec:
   replicas: 1
   selector:
@@ -94,15 +87,7 @@ spec:
           - --upstream=file:///dev/null
           - --upstream=http://localhost/redirect/
           - --http-address=0.0.0.0:4180
-<<<<<<< HEAD
-<<<<<<< HEAD
           - --cookie-domain=.{{ .Values.baseurl }}
-=======
-          - --cookie-domain=.{{ .Values.prow.baseurl }}
->>>>>>> Template secrets
-=======
-          - --cookie-domain=.{{ .Values.baseurl }}
->>>>>>> Pass linter
           - --footer=-
           # Register a new application
           # https://github.com/settings/applications/new
