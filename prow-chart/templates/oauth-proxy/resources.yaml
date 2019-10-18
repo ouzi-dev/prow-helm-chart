@@ -5,9 +5,9 @@ metadata:
   name: github-oauth-secret
 type: Opaque
 data:
-  client-id: {{ .global.oauth-proxy.client_id }}
-  client-secret: {{.global.oauth-proxy.client_secret }}
-  cookie-secret:  {{ .global.oauth-proxy.cookie_secret }}
+  client-id: {{ .Values.secrets.oauthproxy-client-id }}
+  client-secret: {{ .Values.secrets.oauthproxy-client-secret }}
+  cookie-secret:  {{ randAlphaNum 20 | b64enc | quote }} 
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -83,11 +83,11 @@ spec:
           args:
           - --provider=github
           - --email-domain=*
-          - --github-org={{ .global.github.org }}
+          - --github-org={{ .Values.github.org }}
           - --upstream=file:///dev/null
           - --upstream=http://localhost/redirect/
           - --http-address=0.0.0.0:4180
-          - --cookie-domain=.{{ .global.prow.baseurl }}
+          - --cookie-domain=.{{ .Values.prow.baseurl }}
           - --footer=-
           # Register a new application
           # https://github.com/settings/applications/new

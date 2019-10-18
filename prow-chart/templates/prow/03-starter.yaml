@@ -1,6 +1,3 @@
-# This file contains Kubernetes YAML files for the most important prow
-# components. Don't edit resources in this file. Instead, pull them out into
-# their own files.
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -97,7 +94,7 @@ metadata:
   labels:
     app: hook
 spec:
-  replicas: 1
+  replicas: {{ .Values.hook.replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -112,7 +109,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: hook
-        image: {{ quote .Values.prow.image.hook }}
+        image: {{ quote .Values.hook.image }}
         imagePullPolicy: IfNotPresent
         args:
         - --slack-token-file=/etc/slack/token
@@ -164,7 +161,7 @@ spec:
           secretName: slack-token      
       - name: hmac
         secret:
-          secretName: hmac-token
+          secretName: prow-hmac-token
       - name: oauth
         secret:
           secretName: oauth-token
@@ -210,7 +207,7 @@ spec:
       serviceAccountName: "plank"
       containers:
       - name: plank
-        image: {{ quote .Values.prow.image.plank }}
+        image: {{ quote .Values.plank.image }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -261,7 +258,7 @@ metadata:
   labels:
     app: sinker
 spec:
-  replicas: 1
+  replicas: {{ .Values.sinker.replicas }}
   template:
     metadata:
       labels:
@@ -270,7 +267,7 @@ spec:
       serviceAccountName: "sinker"
       containers:
       - name: sinker
-        image: {{ quote .Values.prow.image.sinker }}
+        image: {{ quote .Values.sinker.image }}
         args:
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
@@ -300,7 +297,7 @@ metadata:
   labels:
     app: deck
 spec:
-  replicas: 1
+  replicas: {{ .Values.deck.replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -315,12 +312,12 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: deck
-        image: {{ quote .Values.prow.image.deck }}
+        image: {{ quote .Values.deck.image }}
         args:
         - --config-path=/etc/config/config.yaml
         - --tide-url=http://tide/
         - --hook-url=http://hook:8888/plugin-help
-        - --redirect-http-to={{ quote .Values.prow.baseurl }}
+        - --redirect-http-to={{ quote .Values.baseurl }}
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
         - --oauth-url=/github-login
@@ -365,7 +362,7 @@ spec:
           name: job-config
       - name: oauth-config
         secret:
-            secretName: github-oauth-config
+            secretName: prow-oauth-config
       - name: cookie-secret
         secret:
             secretName: cookie
@@ -404,7 +401,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: horologium
-        image: {{ quote .Values.prow.image.horologium }}
+        image: {{ quote .Values.horologium.image }}
         args:
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
@@ -442,15 +439,15 @@ spec:
       serviceAccountName: "tide"
       containers:
       - name: tide
-        image: {{ quote .Values.prow.image.tide }}
+        image: {{ quote .Values.tide.image }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=http://ghproxy
 #        - --github-endpoint=https://api.github.com
         - --gcs-credentials-file=/etc/service-account/service-account.json
-        - --history-uri=gs://{{ .Values.prow.bucket_name }}/tide-history.json
-        - --status-path=gs://{{ .Values.prow.bucket_name }}/tide-status-checkpoint.yaml
+        - --history-uri=gs://{{ .Values.prow-bucket-name }}/tide-history.json
+        - --status-path=gs://{{ .Values.prow-bucket-name }}/tide-status-checkpoint.yaml
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
         ports:
@@ -480,7 +477,7 @@ spec:
           name: config
       - name: service-account
         secret:
-          secretName: gcs-credentials
+          secretName: prow-bucket-gcs-credentials
       - name: job-config
         configMap:
           name: job-config
@@ -507,7 +504,7 @@ metadata:
   labels:
     app: statusreconciler
 spec:
-  replicas: 1
+  replicas: {{ .Values.statusreconciler.replicas }}
   template:
     metadata:
       labels:
@@ -517,7 +514,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: statusreconciler
-        image: {{ quote .Values.prow.image.status-reconciler }}
+        image: {{ quote .Values.statusreconciler.image }}
         args:
         - --dry-run=false
         - --continue-on-error=true
@@ -799,7 +796,7 @@ metadata:
   labels:
     app: needs-rebase
 spec:
-  replicas: 1
+  replicas: {{ .Values.needs-rebase.replicas }}
   template:
     metadata:
       labels:
@@ -808,7 +805,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: needs-rebase
-        image: {{ quote .Values.prow.image.needs-rebase }}
+        image: {{ quote .Values.needs-rebase.image}}
         imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
@@ -830,7 +827,7 @@ spec:
       volumes:
       - name: hmac
         secret:
-          secretName: hmac-token
+          secretName: prow-hmac-token
       - name: oauth
         secret:
           secretName: oauth-token
@@ -856,7 +853,7 @@ kind: CronJob
 metadata:
  name: branchprotector
 spec:
- schedule: "12 * * * *"  # Every hour at 12 minutes past the hour
+ schedule: {{ .Values.branch-protector.schedule | quote }}
  concurrencyPolicy: Forbid
  jobTemplate:
    metadata:
@@ -867,7 +864,7 @@ spec:
        spec:
          containers:
          - name: branchprotector
-           image: {{ quote .Values.prow.image.branch-protector }}
+           image: {{ quote .Values.branch-protector.image }}
            args:
            - --config-path=/etc/config/config.yaml
            - --job-config-path=/etc/job-config
@@ -903,7 +900,7 @@ metadata:
   labels:
     app: pushgateway
 spec:
-  replicas: 1
+  replicas: {{ .Values.pushgateway.replicas }}
   template:
     metadata:
       labels:
@@ -911,7 +908,7 @@ spec:
     spec:
       containers:
       - name: pushgateway
-        image: prom/pushgateway:v0.4.0
+        image: {{ .Values.pushgateway.image }}
         ports:
           - name: http
             containerPort: 9091
@@ -964,7 +961,7 @@ metadata:
   labels:
     app: pushgateway-proxy
 spec:
-  replicas: 1
+  replicas: {{ .Values.pushgateway.proxy.replicas }}
   template:
     metadata:
       labels:
@@ -975,7 +972,7 @@ spec:
         ports:
           - name: http
             containerPort: 8081
-        image: nginx:1
+        image: {{ .Values.pushgateway.proxy.image }}
         volumeMounts:
         - name: config-volume
           mountPath: /etc/nginx/
@@ -1006,7 +1003,7 @@ metadata:
   labels:
     app: ghproxy
 spec:
-  replicas: 1 
+  replicas: {{ .Values.ghproxy.replicas }}
   template:
     metadata:
       labels:
@@ -1014,10 +1011,10 @@ spec:
     spec:
       containers:
       - name: ghproxy
-        image: gcr.io/k8s-prow/ghproxy:v20190625-9f02db3fe
+        image: {{ .Values.ghproxy.image }}
         args:
         - --cache-dir=/cache
-        - --cache-sizeGB=19
+        - --cache-sizeGB={{ .Values.ghproxy.cache-sizeGB }}
         - --push-gateway=pushgateway
         - --serve-metrics=true
         ports:
@@ -1090,7 +1087,7 @@ metadata:
   labels:
     app: crier
 spec:
-  replicas: 1
+  replicas: {{ .Values.prow.image.replicas }}
   template:
     metadata:
       labels:
@@ -1100,7 +1097,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: crier
-        image: {{ quote .Values.prow.image.crier }}
+        image: {{ .Values.prow.image.crier }}
         args:
         - --github-workers=1
         - --slack-workers=1
@@ -1142,7 +1139,7 @@ kind: CronJob
 metadata:
   name: label-sync
 spec:
-  schedule: "0 5 * * *" 
+  schedule: {{ .Values.label-sync.schedule | quote }}
   concurrencyPolicy: Forbid
   jobTemplate:
     metadata:
@@ -1187,7 +1184,7 @@ metadata:
   name: prow
 spec:
   rules:
-  - host: {{ quote .Values.prow.baseurl }}
+  - host: {{ quote .Values.deck.baseurl }}
     http:
       paths:
       - backend:
@@ -1196,8 +1193,8 @@ spec:
         path: /
   tls:
   - hosts:
-    - {{ quote .Values.prow.baseurl }}
-    secretName: prow-tls
+    - {{ quote .Values.deck.baseurl }}
+    secretName: deck-tls
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -1209,7 +1206,7 @@ metadata:
   name: hook
 spec:
   rules:
-  - host: {{ quote .Values.prow.baseurl }}
+  - host: {{ quote .Values.deck.baseurl }}
     http:
       paths:
       - backend:
@@ -1218,5 +1215,5 @@ spec:
         path: /hook
   tls:
   - hosts:
-    - {{ quote .Values.prow.baseurl }}
-    secretName: prow-tls    
+    - {{ quote .Values.deck.baseurl }}
+    secretName: deck-tls    

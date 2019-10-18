@@ -8,8 +8,8 @@ metadata:
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: gce-ssd-retain
-provisioner: kubernetes.io/gce-pd
+  name: ssd-retain
+provisioner: {{ .Values.storage.provisioner }}
 parameters:
   type: pd-ssd
 reclaimPolicy: Retain
@@ -26,25 +26,18 @@ spec:
   resources:
     requests:
       storage: 20Gi
-  storageClassName: gce-ssd-retain
-  # gce-ssd-retain is specified in prow/cluster/gce-ssd-retain_storageclass.yaml
-  #
-  # If you are setting up your own Prow instance you can do any of the following:
-  # 1) Delete this to use the default storage class for your cluster.
-  # 2) Specify your own storage class.
-  # 3) If you are using GKE you can use the gce-ssd-retain storage class. It can be
-  #    created with: `kubectl create -f prow/cluster/gce-ssd-retain_storageclass.yaml
+  storageClassName: ssd-retain
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: prow-test-pods
+  name: prow
   namespace: {{ .Release.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: prow-test-pods
+  name: prow
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -57,18 +50,18 @@ subjects:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: gcs-credentials
+  name: prow-bucket-gcs-credentials
 type: Opaque
 data:
-  service-account.json: {{ .Values.gcloud.prowbucket_svc_account_key }}
+  service-account.json: {{ .Values.secrets.prow-bucket-gcs-credentials }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hmac-token
+  name: prow-hmac-token
 type: Opaque
 data:
-  hmac: {{ .Values.prow.webhook_hmac_token }}
+  hmac: {{ .Values.secrets.prow-hmac-token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -76,7 +69,7 @@ metadata:
   name: slack-token
 type: Opaque
 data:
-  token: {{ .Values.slack.token }}
+  token: {{ .Values.secrets.slack-token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -84,7 +77,7 @@ metadata:
   name: oauth-token
 type: Opaque
 data:
-  oauth: {{ .Values.github.bot.token }}
+  oauth: {{ .Values.secrets.github-token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -92,7 +85,7 @@ metadata:
   name: github-token
 type: Opaque
 data:
-  oauth: {{ .Values.github.bot.token }}
+  oauth: {{ .Values.secrets.github-token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -100,15 +93,15 @@ metadata:
   name: github-ssh-key
 type: Opaque
 data:
-  key: {{} .Values.github.bot.ssh_key }}  
+  key: {{ .Values.github-sshkey }}  
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: github-oauth-config
+  name: prow-oauth-config
 type: Opaque
 data:
-  secret: {{ .Values.prow.oauth_config }}
+  secret: {{ .Values.secrets.prow-oauth-config }}
 ---
 apiVersion: v1
 kind: Secret
@@ -116,33 +109,33 @@ metadata:
   name: cookie
 type: Opaque
 data:
-  secret: {{ .Values.prow.cookie_secret }}  
+  secret: {{ randAlphaNum 20 | b64enc | quote }} 
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: terraform-google-service-account
-type: Opaque
-data:
-  key.json: {{ .Values.gcloud.terraform_gke_svc_account_key }}  
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: terraform-aws-service-account
-type: Opaque
-data:
-  access_key_id: {{ .Values.aws.terraform_user_access_key_id }}  
-  secret_access_key: {{ .Values.aws.terraform_user_secret_access_key }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: github-bot-pull-push-secret
-data:
-  .dockerconfigjson: {{ .global.docker.config }}
-type: kubernetes.io/dockerconfigjson
----
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: terraform-google-service-account
+# type: Opaque
+# data:
+#   key.json: {{ .Values.gcloud.terraform_gke_svc_account_key }}  
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: terraform-aws-service-account
+# type: Opaque
+# data:
+#   access_key_id: {{ .Values.aws.terraform_user_access_key_id }}  
+#   secret_access_key: {{ .Values.aws.terraform_user_secret_access_key }}
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: github-bot-pull-push-secret
+# data:
+#   .dockerconfigjson: {{ .Values.secrets.docker-config }}
+# type: kubernetes.io/dockerconfigjson
+# ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -390,7 +383,7 @@ data:
           name: lifecycle/rotten
           target: both
           prowPlugin: lifecycle
-          addedBy: anyone or [@{{ .global.github.bot.username }}](https://github.com/{{ .global.github.bot.username }}) 
+          addedBy: anyone or [@{{ .Values.github.bot-username }}](https://github.com/{{ .Values.github.bot-username }}) 
         - color: "795548"
           description: Denotes an issue or PR has remained open with no activity and has become stale.
           name: lifecycle/stale
@@ -398,7 +391,7 @@ data:
             - name: stale
           target: both
           prowPlugin: lifecycle
-          addedBy: anyone or [@{{ .global.github.bot.username }}](https://github.com/{{ .global.github.bot.username }}) 
+          addedBy: anyone or [@{{ .Values.github.bot-username }}](https://github.com/{{ .Values.github.bot-username }}) 
         - color: ededed
           description: Indicates a PR lacks a `kind/foo` label and requires one.
           name: needs-kind
