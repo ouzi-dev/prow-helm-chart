@@ -1,0 +1,1219 @@
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: prowjobs.prow.k8s.io
+spec:
+  group: prow.k8s.io
+  version: v1
+  names:
+    kind: ProwJob
+    singular: prowjob
+    plural: prowjobs
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            max_concurrency:
+              type: integer
+              minimum: 0
+            type:
+              type: string
+              enum:
+              - "presubmit"
+              - "postsubmit"
+              - "periodic"
+              - "batch"
+        status:
+          properties:
+            state:
+              type: string
+              enum:
+              - "triggered"
+              - "pending"
+              - "success"
+              - "failure"
+              - "aborted"
+              - "error"
+          anyOf:
+          - not:
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - "success"
+                  - "failure"
+                  - "error"
+                  - "aborted"
+          - required:
+            - completionTime
+  additionalPrinterColumns:
+  - name: Job
+    type: string
+    description: The name of the job being run.
+    JSONPath: .spec.job
+  - name: BuildId
+    type: string
+    description: The ID of the job being run.
+    JSONPath: .status.build_id
+  - name: Type
+    type: string
+    description: The type of job being run.
+    JSONPath: .spec.type
+  - name: Org
+    type: string
+    description: The org for which the job is running.
+    JSONPath: .spec.refs.org
+  - name: Repo
+    type: string
+    description: The repo for which the job is running.
+    JSONPath: .spec.refs.repo
+  - name: Pulls
+    type: string
+    description: The pulls for which the job is running.
+    JSONPath: ".spec.refs.pulls[*].number"
+  - name: StartTime
+    type: date
+    description: When the job started running.
+    JSONPath: .status.startTime
+  - name: CompletionTime
+    type: date
+    description: When the job finished running.
+    JSONPath: .status.completionTime
+  - name: State
+    description: The state of the job.
+    type: string
+    JSONPath: .status.state
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hook
+  labels:
+    app: hook
+spec:
+  replicas: {{ .Values.hook.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: hook
+    spec:
+      serviceAccountName: "hook"
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: hook
+        image: {{ quote .Values.hook.image }}
+        imagePullPolicy: IfNotPresent
+        args:
+        - --slack-token-file=/etc/slack/token
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        - --job-config-path=/etc/job-config
+        ports:
+          - name: http
+            containerPort: 8888
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: slack
+          mountPath: /etc/slack
+          readOnly: true 
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          timeoutSeconds: 600
+      volumes:
+      - name: slack
+        secret:
+          secretName: slack-token      
+      - name: hmac
+        secret:
+          secretName: prow-hmac-token
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: config
+        configMap:
+          name: config
+      - name: plugins
+        configMap:
+          name: plugins
+      - name: job-config
+        configMap:
+          name: job-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hook
+spec:
+  selector:
+    app: hook
+  ports:
+  - name: http
+    port: 8888
+  - name: metrics
+    port: 9090
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: plank
+  labels:
+    app: plank
+spec:
+  replicas: 1 # Do not scale up.
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: plank
+    spec:
+      serviceAccountName: "plank"
+      containers:
+      - name: plank
+        image: {{ quote .Values.plank.image }}
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --skip-report=true
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        - --job-config-path=/etc/job-config
+        ports:
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plank
+spec:
+  selector:
+    app: plank
+  ports:
+  - name: metrics
+    port: 9090
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sinker
+  labels:
+    app: sinker
+spec:
+  replicas: {{ .Values.sinker.replicas }}
+  template:
+    metadata:
+      labels:
+        app: sinker
+    spec:
+      serviceAccountName: "sinker"
+      containers:
+      - name: sinker
+        image: {{ quote .Values.sinker.image }}
+        args:
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        - --dry-run=false
+        ports:
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deck
+  labels:
+    app: deck
+spec:
+  replicas: {{ .Values.deck.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: deck
+    spec:
+      serviceAccountName: "deck"
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: deck
+        image: {{ quote .Values.deck.image }}
+        args:
+        - --config-path=/etc/config/config.yaml
+        - --tide-url=http://tide/
+        - --hook-url=http://hook:8888/plugin-help
+        - --redirect-http-to={{ quote .Values.baseurl }}
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        - --oauth-url=/github-login
+        - --spyglass=true
+        ports:
+          - name: http
+            containerPort: 8080
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        - name: oauth-config
+          mountPath: /etc/github
+          readOnly: true
+        - name: cookie-secret
+          mountPath: /etc/cookie
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          timeoutSeconds: 600
+      volumes:
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+      - name: oauth-config
+        secret:
+            secretName: prow-oauth-config
+      - name: cookie-secret
+        secret:
+            secretName: cookie
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deck
+spec:
+  selector:
+    app: deck
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: metrics
+    port: 9090
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: horologium
+  labels:
+    app: horologium
+spec:
+  replicas: 1 # Do not scale up.
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: horologium
+    spec:
+      serviceAccountName: "horologium"
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: horologium
+        image: {{ quote .Values.horologium.image }}
+        args:
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        - --dry-run=false
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tide
+  labels:
+    app: tide
+spec:
+  replicas: 1 # Do not scale up.
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tide
+    spec:
+      serviceAccountName: "tide"
+      containers:
+      - name: tide
+        image: {{ quote .Values.tide.image }}
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        - --gcs-credentials-file=/etc/service-account/service-account.json
+        - --history-uri=gs://{{ .Values.prowbucketname }}/tide-history.json
+        - --status-path=gs://{{ .Values.prowbucketname }}/tide-status-checkpoint.yaml
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        ports:
+          - name: http
+            containerPort: 8888
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: service-account
+          mountPath: /etc/service-account
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: config
+        configMap:
+          name: config
+      - name: service-account
+        secret:
+          secretName: prow-bucket-gcs-credentials
+      - name: job-config
+        configMap:
+          name: job-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tide
+spec:
+  selector:
+    app: tide
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8888
+  - port: 9090
+    name: metrics
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: statusreconciler
+  labels:
+    app: statusreconciler
+spec:
+  replicas: {{ .Values.statusreconciler.replicas }}
+  template:
+    metadata:
+      labels:
+        app: statusreconciler
+    spec:
+      serviceAccountName: statusreconciler
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: statusreconciler
+        image: {{ quote .Values.statusreconciler.image }}
+        args:
+        - --dry-run=false
+        - --continue-on-error=true
+        - --plugin-config=/etc/plugins/plugins.yaml
+        - --config-path=/etc/config/config.yaml
+        - --github-token-path=/etc/github/oauth
+        - --job-config-path=/etc/job-config
+        volumeMounts:
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+      - name: plugins
+        configMap:
+          name: plugins
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: "deck"
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "deck"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "deck"
+subjects:
+- kind: ServiceAccount
+  name: "deck"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "deck"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: "horologium"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "horologium"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "horologium"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "horologium"
+subjects:
+- kind: ServiceAccount
+  name: "horologium"
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: "plank"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "plank"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - get
+      - create
+      - list
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - create
+      - delete
+      - list 
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "plank"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "plank"
+subjects:
+- kind: ServiceAccount
+  name: "plank"
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: "sinker"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "sinker"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - delete
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - delete
+      - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "sinker"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "sinker"
+subjects:
+- kind: ServiceAccount
+  name: "sinker"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "hook"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "hook"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - get
+      - update
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "hook"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "hook"
+subjects:
+- kind: ServiceAccount
+  name: "hook"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "tide"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "tide"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "tide"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "tide"
+subjects:
+- kind: ServiceAccount
+  name: "tide"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "statusreconciler"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "statusreconciler"
+rules:
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - prowjobs
+    verbs:
+      - create
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "statusreconciler"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "statusreconciler"
+subjects:
+- kind: ServiceAccount
+  name: "statusreconciler"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: needs-rebase
+  labels:
+    app: needs-rebase
+spec:
+  replicas: {{ .Values.needsrebase.replicas }}
+  template:
+    metadata:
+      labels:
+        app: needs-rebase
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: needs-rebase
+        image: {{ quote .Values.needsrebase.image}}
+        imagePullPolicy: IfNotPresent
+        args:
+        - --dry-run=false
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        ports:
+          - name: http
+            containerPort: 8888
+        volumeMounts:
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+      volumes:
+      - name: hmac
+        secret:
+          secretName: prow-hmac-token
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: plugins
+        configMap:
+          name: plugins
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: needs-rebase
+spec:
+  selector:
+    app: needs-rebase
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8888
+  type: ClusterIP
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+ name: branchprotector
+spec:
+ schedule: {{ .Values.branchprotector.schedule | quote }}
+ concurrencyPolicy: Forbid
+ jobTemplate:
+   metadata:
+     labels:
+       app: branchprotector
+   spec:
+     template:
+       spec:
+         containers:
+         - name: branchprotector
+           image: {{ quote .Values.branchprotector.image }}
+           args:
+           - --config-path=/etc/config/config.yaml
+           - --job-config-path=/etc/job-config
+           - --github-token-path=/etc/github/oauth
+           - --confirm=true
+           - --github-endpoint=http://ghproxy
+           volumeMounts:
+           - name: oauth
+             mountPath: /etc/github
+             readOnly: true
+           - name: config
+             mountPath: /etc/config
+             readOnly: true
+           - name: job-config
+             mountPath: /etc/job-config
+             readOnly: true
+         restartPolicy: Never
+         volumes:
+         - name: oauth
+           secret:
+             secretName: oauth-token
+         - name: config
+           configMap:
+             name: config
+         - name: job-config
+           configMap:
+             name: job-config
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pushgateway
+  labels:
+    app: pushgateway
+spec:
+  replicas: {{ .Values.pushgateway.replicas }}
+  template:
+    metadata:
+      labels:
+        app: pushgateway
+    spec:
+      containers:
+      - name: pushgateway
+        image: {{ .Values.pushgateway.image }}
+        ports:
+          - name: http
+            containerPort: 9091
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway
+  labels:
+    app: pushgateway
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  type: ClusterIP
+  selector:
+    app: pushgateway
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pushgateway-proxy-config
+data:
+  nginx.conf: |-
+    user www-data;
+    worker_processes 4;
+    pid /run/nginx.pid;
+    error_log /dev/stdout;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      access_log /dev/stdout;
+      server {
+        listen 0.0.0.0:8081;
+        location / {
+          limit_except GET {
+            deny all;
+          }
+          proxy_pass http://pushgateway;
+        }
+      }
+    }
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pushgateway-proxy
+  labels:
+    app: pushgateway-proxy
+spec:
+  replicas: {{ .Values.pushgateway.proxy.replicas }}
+  template:
+    metadata:
+      labels:
+        app: pushgateway-proxy
+    spec:
+      containers:
+      - name: nginx
+        ports:
+          - name: http
+            containerPort: 8081
+        image: {{ .Values.pushgateway.proxy.image }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/
+      volumes:
+      - name: config-volume
+        configMap:
+          name: pushgateway-proxy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway-external
+  labels:
+    app: pushgateway-external
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  type: ClusterIP
+  selector:
+    app: pushgateway-proxy
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ghproxy
+  labels:
+    app: ghproxy
+spec:
+  replicas: {{ .Values.ghproxy.replicas }}
+  template:
+    metadata:
+      labels:
+        app: ghproxy
+    spec:
+      containers:
+      - name: ghproxy
+        image: {{ .Values.ghproxy.image }}
+        args:
+        - --cache-dir=/cache
+        - --cache-sizeGB={{ .Values.ghproxy.cachesizeGB }}
+        - --push-gateway=pushgateway
+        - --serve-metrics=true
+        ports:
+        - containerPort: 8888
+        - containerPort: 9090
+        volumeMounts:
+        - name: cache
+          mountPath: /cache
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: ghproxy
+      # run on our dedicated node
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ghproxy
+  name: ghproxy
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8888
+  - name: metrics
+    port: 9090
+  selector:
+    app: ghproxy
+  type: ClusterIP
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: "crier"
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: crier
+rules:
+- apiGroups:
+    - "prow.k8s.io"
+  resources:
+    - "prowjobs"
+  verbs:
+    - "get"
+    - "watch"
+    - "list"
+    - "patch"
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: "crier"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "crier"
+subjects:
+- kind: ServiceAccount
+  name: "crier"
+  namespace: {{ .Release.namespace }}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: crier
+  labels:
+    app: crier
+spec:
+  replicas: {{ .Values.crier.replicas }}
+  template:
+    metadata:
+      labels:
+        app: crier
+    spec:
+      serviceAccountName: crier
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: crier
+        image: {{ .Values.crier.image }}
+        args:
+        - --github-workers=1
+        - --slack-workers=1
+        - --slack-token-file=/etc/slack/token
+#        - --report-agent=knative-build
+        - --config-path=/etc/config/config.yaml
+        - --job-config-path=/etc/job-config
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: slack
+          mountPath: /etc/slack
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+      - name: oauth
+        secret:
+          secretName: oauth-token
+      - name: slack
+        secret:
+          secretName: slack-token
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: label-sync
+spec:
+  schedule: {{ .Values.labelsync.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app: label-sync
+    spec:
+      template:
+        spec:
+          containers:
+            - name: label-sync
+              image: {{ quote .Values.labelsync.image }}
+              args:
+              - --config=/etc/config/labels.yaml
+              - --confirm=true
+              - --orgs={{ .Values.github.org }}
+              - --token=/etc/github/oauth
+              volumeMounts:
+              - name: oauth
+                mountPath: /etc/github
+                readOnly: true
+              - name: config
+                mountPath: /etc/config
+                readOnly: true
+          restartPolicy: Never
+          volumes:
+          - name: oauth
+            secret:
+              secretName: oauth-token
+          - name: config
+            configMap:
+              name: label-config
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"    
+  name: prow
+spec:
+  rules:
+  - host: {{ quote .Values.deck.baseurl }}
+    http:
+      paths:
+      - backend:
+          serviceName: deck
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - {{ quote .Values.deck.baseurl }}
+    secretName: deck-tls
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
+  name: hook
+spec:
+  rules:
+  - host: {{ quote .Values.deck.baseurl }}
+    http:
+      paths:
+      - backend:
+          serviceName: hook
+          servicePort: 8888
+        path: /hook
+  tls:
+  - hosts:
+    - {{ quote .Values.deck.baseurl }}
+    secretName: deck-tls    
