@@ -8,7 +8,7 @@ spec:
     # You must replace this email address with your own.
     # Let's Encrypt will use this to contact you about expiring
     # certificates, and issues related to your account.
-    email: {{ .global.email }}
+    email: {{ .Values.email }}
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # Secret resource used to store the account's private key.
@@ -18,7 +18,7 @@ spec:
     - dns01:
         clouddns:
           # The ID of the GCP project
-          project: {{.global.gcloud.project}}
+          project: {{.Values.gcloud.project}}
           # This is the secret used to access the service account
           serviceAccountSecretRef:
             name: clouddns-dns01-solver-svc-acct

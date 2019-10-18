@@ -446,8 +446,8 @@ spec:
         - --github-endpoint=http://ghproxy
 #        - --github-endpoint=https://api.github.com
         - --gcs-credentials-file=/etc/service-account/service-account.json
-        - --history-uri=gs://{{ .Values.prow-bucket-name }}/tide-history.json
-        - --status-path=gs://{{ .Values.prow-bucket-name }}/tide-status-checkpoint.yaml
+        - --history-uri=gs://{{ .Values.prowbucketname }}/tide-history.json
+        - --status-path=gs://{{ .Values.prowbucketname }}/tide-status-checkpoint.yaml
         - --config-path=/etc/config/config.yaml
         - --job-config-path=/etc/job-config
         ports:
@@ -796,7 +796,7 @@ metadata:
   labels:
     app: needs-rebase
 spec:
-  replicas: {{ .Values.needs-rebase.replicas }}
+  replicas: {{ .Values.needsrebase.replicas }}
   template:
     metadata:
       labels:
@@ -805,7 +805,7 @@ spec:
       terminationGracePeriodSeconds: 180
       containers:
       - name: needs-rebase
-        image: {{ quote .Values.needs-rebase.image}}
+        image: {{ quote .Values.needsrebase.image}}
         imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
@@ -853,7 +853,7 @@ kind: CronJob
 metadata:
  name: branchprotector
 spec:
- schedule: {{ .Values.branch-protector.schedule | quote }}
+ schedule: {{ .Values.branchprotector.schedule | quote }}
  concurrencyPolicy: Forbid
  jobTemplate:
    metadata:
@@ -864,7 +864,7 @@ spec:
        spec:
          containers:
          - name: branchprotector
-           image: {{ quote .Values.branch-protector.image }}
+           image: {{ quote .Values.branchprotector.image }}
            args:
            - --config-path=/etc/config/config.yaml
            - --job-config-path=/etc/job-config
@@ -1014,7 +1014,7 @@ spec:
         image: {{ .Values.ghproxy.image }}
         args:
         - --cache-dir=/cache
-        - --cache-sizeGB={{ .Values.ghproxy.cache-sizeGB }}
+        - --cache-sizeGB={{ .Values.ghproxy.cachesizeGB }}
         - --push-gateway=pushgateway
         - --serve-metrics=true
         ports:
@@ -1087,7 +1087,7 @@ metadata:
   labels:
     app: crier
 spec:
-  replicas: {{ .Values.prow.image.replicas }}
+  replicas: {{ .Values.crier.replicas }}
   template:
     metadata:
       labels:
@@ -1097,7 +1097,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: crier
-        image: {{ .Values.prow.image.crier }}
+        image: {{ .Values.crier.image }}
         args:
         - --github-workers=1
         - --slack-workers=1
@@ -1139,7 +1139,7 @@ kind: CronJob
 metadata:
   name: label-sync
 spec:
-  schedule: {{ .Values.label-sync.schedule | quote }}
+  schedule: {{ .Values.labelsync.schedule | quote }}
   concurrencyPolicy: Forbid
   jobTemplate:
     metadata:
@@ -1150,7 +1150,7 @@ spec:
         spec:
           containers:
             - name: label-sync
-              image: {{ quote .Values.prow.image.label-sync }}
+              image: {{ quote .Values.labelsync.image }}
               args:
               - --config=/etc/config/labels.yaml
               - --confirm=true

@@ -9,19 +9,27 @@ gcloud:
 
 github:
   org: ouzi-dev
-  bot-username: ouzibot
+  bot:
+    username: ouzibot
 
 secrets:
-  slack-token: 
-  github-token: 
-  github-sshkey:
-  prow-hmac-token: 
-  prow-oauth-config:
-  prow-bucket-gcs-credentials:
-  oauthproxy-client-id: 
-  oauthproxy-client-secret: 
+  slack:
+    token: 
+  github:
+    token: 
+    sshkey:
+  prow:
+    hmactoken: 
+    oauthconfig:
+    bucketgcscredentials:
+  oauthproxy:
+    clientid: 
+    clientsecret: 
 
-prow-bucket-name: ouzidev-testinfra-252513-prow-artefacts
+prowbucketname: ouzidev-testinfra-252513-prow-artefacts
+
+oauthproxy:
+  image: quay.io/pusher/oauth2_proxy:v3.1.0
 
 hook:
   image: gcr.io/k8s-prow/hook:v20191017-af5797562
@@ -41,15 +49,15 @@ tide:
 statusreconciler:
   image: gcr.io/k8s-prow/status-reconciler:v20191017-af5797562
   replicas: 1
-needs-rebase:
+needsrebase:
   image: gcr.io/k8s-prow/needs-rebase:v20190517-95ef25d87
-branch-protector:
+branchprotector:
   image: gcr.io/k8s-prow/branchprotector:v20190625-9f02db3fe
   schedule: 12 * * * * # Every hour at 12 minutes past the hour
 crier:
   image: gcr.io/k8s-prow/crier:v20190625-9f02db3fe
   replicas: 1
-label-sync:
+labelsync:
   image: gcr.io/k8s-prow/label_sync:v20190625-9f02db3fe
   schedule: 0 5 * * * # Every day at 5AM
 
@@ -62,7 +70,7 @@ pushgateway:
 ghproxy:
   image: gcr.io/k8s-prow/ghproxy:v20190625-9f02db3fe
   replicas: 1
-  cache-sizeGB: 19
+  cachesizeGB: 19
 
 ## SUBCHART Configuration
 ## Unfortunately some duplication must occur as we can remap values to other values in helm
@@ -80,7 +88,7 @@ external-dns:
 ## nginx configuration
 ## Ref: https://github.com/kubernetes/ingress/blob/master/controllers/nginx/configuration.md
 ##
-nginx-ingress:
+nginxingress:
   controller:
     service:
       annotations:

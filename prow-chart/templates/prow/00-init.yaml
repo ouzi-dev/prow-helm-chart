@@ -53,7 +53,7 @@ metadata:
   name: prow-bucket-gcs-credentials
 type: Opaque
 data:
-  service-account.json: {{ .Values.secrets.prow-bucket-gcs-credentials }}
+  service-account.json: {{ .Values.secrets.prow.bucketgcscredentials }}
 ---
 apiVersion: v1
 kind: Secret
@@ -61,7 +61,7 @@ metadata:
   name: prow-hmac-token
 type: Opaque
 data:
-  hmac: {{ .Values.secrets.prow-hmac-token }}
+  hmac: {{ .Values.secrets.prow.hmactoken }}
 ---
 apiVersion: v1
 kind: Secret
@@ -69,7 +69,7 @@ metadata:
   name: slack-token
 type: Opaque
 data:
-  token: {{ .Values.secrets.slack-token }}
+  token: {{ .Values.secrets.slack.token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -77,7 +77,7 @@ metadata:
   name: oauth-token
 type: Opaque
 data:
-  oauth: {{ .Values.secrets.github-token }}
+  oauth: {{ .Values.secrets.github.token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -85,7 +85,7 @@ metadata:
   name: github-token
 type: Opaque
 data:
-  oauth: {{ .Values.secrets.github-token }}
+  oauth: {{ .Values.secrets.github.token }}
 ---
 apiVersion: v1
 kind: Secret
@@ -93,7 +93,7 @@ metadata:
   name: github-ssh-key
 type: Opaque
 data:
-  key: {{ .Values.github-sshkey }}  
+  key: {{ .Values.github.sshkey }}  
 ---
 apiVersion: v1
 kind: Secret
@@ -101,7 +101,7 @@ metadata:
   name: prow-oauth-config
 type: Opaque
 data:
-  secret: {{ .Values.secrets.prow-oauth-config }}
+  secret: {{ .Values.secrets.prow.oauthconfig }}
 ---
 apiVersion: v1
 kind: Secret
@@ -111,31 +111,6 @@ type: Opaque
 data:
   secret: {{ randAlphaNum 20 | b64enc | quote }} 
 ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: terraform-google-service-account
-# type: Opaque
-# data:
-#   key.json: {{ .Values.gcloud.terraform_gke_svc_account_key }}  
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: terraform-aws-service-account
-# type: Opaque
-# data:
-#   access_key_id: {{ .Values.aws.terraform_user_access_key_id }}  
-#   secret_access_key: {{ .Values.aws.terraform_user_secret_access_key }}
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: github-bot-pull-push-secret
-# data:
-#   .dockerconfigjson: {{ .Values.secrets.docker-config }}
-# type: kubernetes.io/dockerconfigjson
-# ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -383,7 +358,7 @@ data:
           name: lifecycle/rotten
           target: both
           prowPlugin: lifecycle
-          addedBy: anyone or [@{{ .Values.github.bot-username }}](https://github.com/{{ .Values.github.bot-username }}) 
+          addedBy: anyone or [@{{ .Values.github.bot.username }}](https://github.com/{{ .Values.github.bot.username }}) 
         - color: "795548"
           description: Denotes an issue or PR has remained open with no activity and has become stale.
           name: lifecycle/stale
@@ -391,7 +366,7 @@ data:
             - name: stale
           target: both
           prowPlugin: lifecycle
-          addedBy: anyone or [@{{ .Values.github.bot-username }}](https://github.com/{{ .Values.github.bot-username }}) 
+          addedBy: anyone or [@{{ .Values.github.bot.username }}](https://github.com/{{ .Values.github.bot.username }}) 
         - color: ededed
           description: Indicates a PR lacks a `kind/foo` label and requires one.
           name: needs-kind
