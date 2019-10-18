@@ -27,11 +27,22 @@ global:
     oauth_config: 
     cookie_secret: 
     bucket_name: 
+    image:
+      hook: gcr.io/k8s-prow/hook:v20191017-af5797562
+      plank: gcr.io/k8s-prow/plank:v20191017-af5797562
+      sinker: gcr.io/k8s-prow/sinker:v20191017-af5797562
+      deck: gcr.io/k8s-prow/deck:v20191017-af5797562
+      horologium: gcr.io/k8s-prow/horologium:v20191017-af5797562
+      tide: gcr.io/k8s-prow/tide:v20191017-af5797562
+      status-reconciler: gcr.io/k8s-prow/status-reconciler:v20191017-af5797562
+      neeeds-rebase: gcr.io/k8s-prow/needs-rebase:v20190517-95ef25d87
+      branch-protector: gcr.io/k8s-prow/branchprotector:v20190625-9f02db3fe
+      crier: gcr.io/k8s-prow/crier:v20190625-9f02db3fe
+      label-sync: gcr.io/k8s-prow/label_sync:v20190625-9f02db3fe
+
   slack:
     token:  
 
-  cert-manager:
-    #gke_svc_account_key: base64 of the account key  
 external-dns:
   ## K8s resources type to be observed for new DNS entries by ExternalDNS 
   sources:
