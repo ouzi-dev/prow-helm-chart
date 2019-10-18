@@ -111,6 +111,31 @@ type: Opaque
 data:
   secret: {{ randAlphaNum 20 | b64enc | quote }} 
 ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: terraform-google-service-account
+# type: Opaque
+# data:
+#   key.json: {{ .Values.gcloud.terraform_gke_svc_account_key }}  
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: terraform-aws-service-account
+# type: Opaque
+# data:
+#   access_key_id: {{ .Values.aws.terraform_user_access_key_id }}  
+#   secret_access_key: {{ .Values.aws.terraform_user_secret_access_key }}
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: github-bot-pull-push-secret
+# data:
+#   .dockerconfigjson: {{ .Values.secrets.docker-config }}
+# type: kubernetes.io/dockerconfigjson
+# ---
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -94,7 +94,11 @@ spec:
           - --upstream=file:///dev/null
           - --upstream=http://localhost/redirect/
           - --http-address=0.0.0.0:4180
+<<<<<<< HEAD
           - --cookie-domain=.{{ .Values.baseurl }}
+=======
+          - --cookie-domain=.{{ .Values.prow.baseurl }}
+>>>>>>> Template secrets
           - --footer=-
           # Register a new application
           # https://github.com/settings/applications/new
