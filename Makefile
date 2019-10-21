@@ -1,8 +1,12 @@
 
+.PHONY: get-deps
+get-deps:
+	helm dependency update ./prow-chart
+
 # does not work without explicitly specifying the api version
 # see: https://github.com/helm/helm/issues/6505 
 .PHONY: validate
-validate:
+validate: get-deps
 	helm template prow \
 	--namespace prow \
 	--debug \
