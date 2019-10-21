@@ -10,7 +10,7 @@ This helm chart will install all the necessary components to have a working [Pro
 
 - All ingress' are behind a reversy proxy with authN via GitHub 
   - using [oauth2-proxy](https://github.com/pusher/oauth2_proxy)
-- Certificates for all ingress are automatically take care of
+- Certificates for all ingress are automatically taken care of
   - using [cert-manager](https://github.com/jetstack/cert-manager)
 - Fully working Prow
   - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow-chart/values.yaml)
