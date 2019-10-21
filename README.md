@@ -18,6 +18,7 @@ This helm chart will install all the necessary components to have a working [Pro
 ## Requirements
 
 This chart is tested against a [GKE cluster](https://cloud.google.com/kubernetes-engine/) but any Kubernetes cluster >= 1.14 should work.
+For help in setting up a GKE cluster for Prow, see our [prow-gke-terraform module](https://github.com/ouzi-dev/prow-gke-terraform)
 
 We assume that the cluster this chart will be installed in is dedicated to Prow.
 
