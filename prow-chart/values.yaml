@@ -14,16 +14,16 @@ github:
 
 secrets:
   slack:
-    #token: 
+    token: 
   github:
-    #token: 
+    token: 
   prow:
-    #hmactoken: 
-    #oauthconfig: 
-    #bucketgcscredentials: 
+    hmactoken: 
+    oauthconfig: 
+    bucketgcscredentials: 
   oauthproxy:
-    #clientid: 
-    #clientsecret:
+    clientid: 
+    clientsecret:
 
 prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 
