@@ -67,8 +67,8 @@ We assume that the cluster this chart will be installed in is dedicated to Prow.
   - name: dead-label
     color: cccccc
     deleteAfter: 2017-01-01T13:00:00Z
-This will ensure that:
   ```
+This will ensure that:
   - [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
 
 ### Auxiliary Cluster component
