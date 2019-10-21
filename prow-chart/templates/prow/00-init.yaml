@@ -58,7 +58,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: prow-hmac-token
+  name: oauth-tokenhmac-token
 type: Opaque
 data:
   hmac: {{ .Values.secrets.prow.hmactoken }}
@@ -90,15 +90,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: github-ssh-key
-type: Opaque
-data:
-  key: {{ .Values.github.sshkey }}  
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: prow-oauth-config
+  name: oauth-config
 type: Opaque
 data:
   secret: {{ .Values.secrets.prow.oauthconfig }}

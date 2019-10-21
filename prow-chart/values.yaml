@@ -17,14 +17,13 @@ secrets:
     token: 
   github:
     token: 
-    sshkey:
   prow:
     hmactoken: 
-    oauthconfig:
-    bucketgcscredentials:
+    oauthconfig: 
+    bucketgcscredentials: 
   oauthproxy:
     clientid: 
-    clientsecret: 
+    clientsecret:
 
 prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 

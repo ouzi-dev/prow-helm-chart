@@ -365,7 +365,7 @@ spec:
             secretName: prow-oauth-config
       - name: cookie-secret
         secret:
-            secretName: cookie
+            secretName: prow-cookie
 ---
 apiVersion: v1
 kind: Service
