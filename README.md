@@ -48,7 +48,7 @@ We assume that the cluster this chart will be installed in is dedicated to Prow.
   - [GitHub Reporter](https://github.com/kubernetes/test-infra/blob/master/prow/github/reporter)
   - [Slack Reporter](https://github.com/kubernetes/test-infra/blob/master/prow/slack/reporter)
 - [sinker](https://github.com/kubernetes/test-infra/tree/master/prow/cmd/sinker): Sinker cleans up old jobs and the pods backing them
-- [horologiem](https://github.com/kubernetes/test-infra/tree/master/prow/cmd/horologium): Triggers periodic jobs ie ProwJobs defined to run on a schedule 
+- [horologium](https://github.com/kubernetes/test-infra/tree/master/prow/cmd/horologium): Triggers periodic jobs ie ProwJobs defined to run on a schedule 
 - [tide](https://github.com/kubernetes/test-infra/blob/395658c487277aadab3904cfdbabfbddb0f2b034/prow/cmd/tide): Tide is responsible for the merging automation once they meet the defined criteria - see the [Tide Readme](https://github.com/kubernetes/test-infra/blob/master/prow/cmd/tide/README.md) for more info. It will automatically retest PRs that meet the criteria ("tide comes in") and automatically merge them when they have up-to-date passing test results ("tide goes out").
 - [statusreconciler](https://github.com/kubernetes/test-infra/tree/master/prow/statusreconciler): Ensures that changes to required presubmits do not cause PRs in flight to get stuck in the merge queue
 - [needs-rebase](https://github.com/kubernetes/test-infra/blob/master/prow/external-plugins/needs-rebase/plugin/plugin.go): Adds a label and blocks merging when rebase is needed
