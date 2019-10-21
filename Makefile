@@ -1,6 +1,10 @@
+.PHONY: add-repos
+add-repos:
+	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+	helm repo add jetstack https://charts.jetstack.io
 
 .PHONY: get-deps
-get-deps:
+get-deps: add-repos
 	helm dependency update ./prow-chart
 
 # does not work without explicitly specifying the api version
