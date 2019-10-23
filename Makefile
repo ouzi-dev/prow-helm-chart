@@ -25,6 +25,7 @@ package:
 	@helm package \
 	--version=$(VERSION) \
 	--dependency-update \
+	--destination dist/ \
 	./prow-chart
 
 .PHONY: lint

@@ -43,8 +43,19 @@
       ],
       "@semantic-release/release-notes-generator",
       [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "make add-repos get-deps package VERSION=v${nextRelease.version}"
+        }
+      ],
+      [
         "@semantic-release/github",
         {
+          "assets": [
+            {
+              "path": "dist/*.tgz"
+            }
+          ],
           "successComment": "This ${issue.pull_request ? 'pull request' : 'issue'} is included in version ${nextRelease.version}",
           "failComment": "The release from ${branch} had failed due to the following errors:\n- ${errors.map(err => err.message).join('\\n- ')}"
         }
