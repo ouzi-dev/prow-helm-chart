@@ -20,6 +20,13 @@ validate: get-deps
 	-a apiextensions.k8s.io/v1beta1 \
 	./prow-chart
 
+.PHONY: package
+package:
+	@helm package \
+	--version=$(VERSION) \
+	--dependency-update \
+	./prow-chart
+
 .PHONY: lint
 lint:
 	helm lint ./prow-chart	
