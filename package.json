@@ -45,7 +45,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "make get-deps package VERSION=v${nextRelease.version}"
+          "prepareCmd": "make package VERSION=v${nextRelease.version}"
         }
       ],
       [
