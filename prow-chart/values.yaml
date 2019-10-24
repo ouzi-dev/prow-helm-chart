@@ -92,3 +92,6 @@ nginxingress:
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
+
+metrics:
+  enabled: false
