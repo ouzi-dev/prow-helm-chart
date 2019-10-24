@@ -14,6 +14,8 @@ This helm chart will install all the necessary components to have a working [Pro
   - using [cert-manager](https://github.com/jetstack/cert-manager)
 - Fully working Prow
   - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow-chart/values.yaml)
+- Helm package published in the releases for easy install - no registry needed 
+  - `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-chart-${RELEASE}.tgz`
 
 ## Requirements
 
