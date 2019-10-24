@@ -7,7 +7,6 @@ add-repos:
 update-repos:
 	helm repo update
 
-
 .PHONY: get-deps
 get-deps: add-repos update-repos
 	helm dependency update ./prow-chart
