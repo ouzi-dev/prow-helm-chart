@@ -35,3 +35,8 @@ dependencies:
     repository: https://kubernetes-charts.storage.googleapis.com/
     tags:
       - nginx-ingress
+  - name: prometheus-operator
+    version: 6.21.0
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    tags:
+      - prometheus-operator
