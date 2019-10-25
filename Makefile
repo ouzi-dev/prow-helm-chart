@@ -28,6 +28,7 @@ validate: get-deps
 	-a cert-manager.io/v1alpha2 \
 	-a monitoring.coreos.com/v1 \
 	-a apiextensions.k8s.io/v1beta1 \
+	-a credstash.local/v1 \
 	./prow-chart
 
 .PHONY: package
