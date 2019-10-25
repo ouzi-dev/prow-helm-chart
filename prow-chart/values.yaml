@@ -29,6 +29,7 @@ prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 
 oauthproxy:
   image: quay.io/pusher/oauth2_proxy:v3.1.0
+  namespace: oath2-proxy
 
 hook:
   image: gcr.io/k8s-prow/hook:v20191017-af5797562
@@ -92,6 +93,14 @@ nginxingress:
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
+
+credstash:
+  enabled: true
+  namespace: credstash-controller
+  aws:
+    access_key_id:
+    secret_access_key: 
+    region: 
 
 metrics:
   enabled: false
