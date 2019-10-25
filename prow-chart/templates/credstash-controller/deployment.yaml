@@ -1,0 +1,42 @@
+{{ if .Values.credstash.enabled }}
+apiVersion: extensions/v1beta1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: credstash-controller
+  namespace: {{ .Values.credstash.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credstash-controller
+  strategy:
+   rollingUpdate:
+     maxSurge: 1
+     maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: credstash-controller
+    spec:
+      serviceAccount: credstash-controller
+      containers:
+      - name: credstash-controller
+        image: {{ .Values.credstash.image }}
+        imagePullPolicy: Always
+        env:
+        - name: CREDSTASH_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: credstash-controller
+              key: CREDSTASH_AWS_ACCESS_KEY_ID
+        - name: CREDSTASH_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: credstash-controller
+              key: CREDSTASH_AWS_SECRET_ACCESS_KEY
+        - name: CREDSTASH_AWS_DEFAULT_REGION
+          valueFrom:
+            secretKeyRef:
+              name: credstash-controller
+              key: CREDSTASH_AWS_DEFAULT_REGION
+{{ end }}

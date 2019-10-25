@@ -16,6 +16,7 @@ This helm chart will install all the necessary components to have a working [Pro
   - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow-chart/values.yaml)
 - Helm package published in the releases for easy install - no registry needed 
   - `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-chart-${RELEASE}.tgz`
+- Comes with a `credstash` controller which will fetch your secrets from [credstash](https://github.com/fugue/credstash) and create equivalent Secret objects. That way you can use your exiting credstash secrets safely in Prow as well. 
 
 ## Requirements
 
@@ -70,8 +71,7 @@ We assume that the cluster this chart will be installed in is dedicated to Prow.
     color: cccccc
     deleteAfter: 2017-01-01T13:00:00Z
   ```
-This will ensure that:
-  - [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
+- [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
 
 ### Auxiliary Cluster component
 

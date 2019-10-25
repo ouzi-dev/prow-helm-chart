@@ -29,6 +29,7 @@ prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 
 oauthproxy:
   image: quay.io/pusher/oauth2_proxy:v3.1.0
+  namespace: oath2-proxy
 
 hook:
   image: gcr.io/k8s-prow/hook:v20191017-af5797562
@@ -59,7 +60,6 @@ crier:
 labelsync:
   image: gcr.io/k8s-prow/label_sync:v20190625-9f02db3fe
   schedule: 0 5 * * * # Every day at 5AM
-
 pushgateway:
   image: prom/pushgateway:v0.4.0
   replicas: 1
@@ -92,6 +92,15 @@ nginxingress:
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
+
+credstash:
+  enabled: true
+  namespace: credstash-controller
+  image: davidjmarkey/credstash-kubernetes-controller:0.6.2
+  aws:
+    access_key_id:
+    secret_access_key: 
+    region: eu-west-1
 
 metrics:
   enabled: false
