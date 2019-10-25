@@ -12,25 +12,36 @@ github:
   bot:
     username: ouzibot
 
-secrets:
-  slack:
-    token: 
-  github:
-    token: 
-  prow:
-    hmactoken: 
-    oauthconfig: 
-    bucketgcscredentials: 
-  oauthproxy:
-    clientid: 
-    clientsecret:
+
+## Credstash Secrets ie secrets fetced from credstash.
+# Key is required
+# Table is optional. if not defined the default is used
+# Version is optional. if not defined the default is used
+credstashSecrets:
+  defaultTable: credential-store
+  defaultVersion: 0000000000000000001
+  slackToken:
+      key: ouzibot_slack_legacytoken
+  githubToken:
+      key: github_bot_personal_access_token_prow
+  prowHmacToken:
+      key: prow-cookie-secret
+ # see https://github.com/kubernetes/test-infra/blob/master/prow/cmd/deck/github_oauth_setup.md#set-up-secrets for the contents 
+  prowOauthConfig: 
+      key: prow-oauth-config
+  prowBucketGcsCredentials:
+      key: prow-bucket-gcs-creds
+  oauthproxy_clientid: 
+      key: prow-cluster-github-oauth-client-id
+  oauthproxy_clientsecret:
+      key: prow-cluster-github-oauth-client-secret
+  oauthproxy_cookiesecret:
+      key: prow-cluster-github-oauth-cookie-secret
 
 prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 
 oauthproxy:
   image: quay.io/pusher/oauth2_proxy:v3.1.0
-  namespace: oath2-proxy
-
 hook:
   image: gcr.io/k8s-prow/hook:v20191017-af5797562
   replicas: 1
@@ -71,8 +82,15 @@ ghproxy:
   replicas: 1
   cachesizeGB: 19
 
+credstash:
+  image: davidjmarkey/credstash-kubernetes-controller:0.6.2
+  aws:
+    access_key_id:
+    secret_access_key: 
+    region: eu-west-1
+
 ## SUBCHART Configuration
-## Unfortunately some duplication must occur as we can remap values to other values in helm
+## Unfortunately some duplication must occur as we cant remap values to other values in helm
 external-dns:
   ## K8s resources type to be observed for new DNS entries by ExternalDNS 
   sources:
@@ -92,15 +110,3 @@ nginxingress:
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: prow.test-infra.ouzi.io
-
-credstash:
-  enabled: true
-  namespace: credstash-controller
-  image: davidjmarkey/credstash-kubernetes-controller:0.6.2
-  aws:
-    access_key_id:
-    secret_access_key: 
-    region: eu-west-1
-
-metrics:
-  enabled: false

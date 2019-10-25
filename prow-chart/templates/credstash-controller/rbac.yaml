@@ -1,4 +1,3 @@
-{{ if .Values.credstash.enabled }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -6,7 +5,6 @@ metadata:
   labels:
     k8s-app: credstash-controller
   name: credstash-controller
-  namespace: {{ .Values.credstash.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -48,5 +46,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: credstash-controller
-    namespace: {{ .Values.credstash.namespace }}
-{{ end }}
+    namespace: {{ .Release.Namespace }}

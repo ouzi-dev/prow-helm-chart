@@ -1,3 +1,9 @@
+VERSION ?= 0.0.0
+
+.PHONY: clean
+clean:
+	rm -rf prow-charts/charts
+
 .PHONY: add-repos
 add-repos:
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
@@ -25,7 +31,7 @@ validate: get-deps
 	./prow-chart
 
 .PHONY: package
-package: get-deps
+package: clean get-deps
 	@helm package \
 	--version=$(VERSION) \
 	--dependency-update \

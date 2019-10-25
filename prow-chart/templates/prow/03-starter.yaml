@@ -1078,7 +1078,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "crier"
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
