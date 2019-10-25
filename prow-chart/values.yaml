@@ -96,6 +96,7 @@ nginxingress:
 credstash:
   enabled: true
   namespace: credstash-controller
+  image: davidjmarkey/credstash-kubernetes-controller:0.6.2
   aws:
     access_key_id:
     secret_access_key: 
