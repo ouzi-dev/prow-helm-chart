@@ -1,4 +1,6 @@
 VERSION ?= 0.0.0
+HELM_EXPERIMENTAL_OCI ?= 1
+export HELM_EXPERIMENTAL_OCI  
 
 .PHONY: clean
 clean:
@@ -38,6 +40,18 @@ package: clean get-deps
 	--dependency-update \
 	--destination dist/ \
 	./prow-chart
+
+# from https://github.com/helm/helm/issues/5861 
+# helm package mychart
+# helm chart save mychart  gcr.io/my-gcp-project/mychart # creates metadata in local folder ~/.helm/registry/
+# gcloud auth configure-docker # needed only once, adds some data in ~/.docker/config.json
+# docker login gcr.io/my-gcp-project/mychart
+# helm chart push  gcr.io/my-gcp-project/mychart
+.PHONY: push
+push: package
+	helm chart save ./prow-chart gcr.io/ouzi-helm-charts/prow-chart:$(VERSION)
+	docker login gcr.io/ouzi-helm-charts/prow-chart
+	helm chart push gcr.io/ouzi-helm-charts/prow-chart:$(VERSION)
 
 .PHONY: lint
 lint:
