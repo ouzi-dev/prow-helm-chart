@@ -60,7 +60,6 @@ crier:
 labelsync:
   image: gcr.io/k8s-prow/label_sync:v20190625-9f02db3fe
   schedule: 0 5 * * * # Every day at 5AM
-
 pushgateway:
   image: prom/pushgateway:v0.4.0
   replicas: 1
@@ -100,7 +99,7 @@ credstash:
   aws:
     access_key_id:
     secret_access_key: 
-    region: 
+    region: eu-west-1
 
 metrics:
   enabled: false
