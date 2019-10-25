@@ -8,8 +8,5 @@ dependencies:
 - name: nginx-ingress
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 1.24.3
-- name: prometheus-operator
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 6.21.0
-digest: sha256:74bf8800c6a16c77a778e0d3cb9cf2a9fec2da17971c7430b253f1aa4682ed79
-generated: "2019-10-24T13:35:02.257931+01:00"
+digest: sha256:b5967dc9fb92ead2dc0c59511af3d679dd37c1f27e2e65e873a74092bd287b1e
+generated: "2019-10-25T12:46:30.492567+01:00"

@@ -32,7 +32,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prow
-  namespace: {{ .Release.namespace }}
+  namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -45,55 +45,67 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: prow
-    namespace: {{ .Release.namespace }}
+    namespace: {{ .Release.Namespace }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: prow-bucket-gcs-credentials
-type: Opaque
-data:
-  service-account.json: {{ .Values.secrets.prow.bucketgcscredentials }}
+spec:
+  - name: service-account.json
+    from: {{ .Values.credstashSecrets.prowBucketGcsCredentials.key | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.prowBucketGcsCredentials.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.prowBucketGcsCredentials.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: oauth-tokenhmac-token
-type: Opaque
-data:
-  hmac: {{ .Values.secrets.prow.hmactoken }}
+spec:
+  - name: hmac
+    from: {{ .Values.credstashSecrets.prowHmacToken.key | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.prowHmacToken.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.prowHmacToken.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: slack-token
-type: Opaque
-data:
-  token: {{ .Values.secrets.slack.token }}
+spec:
+  - name: token
+    from: {{ .Values.credstashSecrets.slackToken.key  | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.slackToken.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.slackToken.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: oauth-token
-type: Opaque
-data:
-  oauth: {{ .Values.secrets.github.token }}
+spec:
+  - name: oauth
+    from: {{ .Values.credstashSecrets.githubToken.key | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.githubToken.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.githubToken.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: github-token
-type: Opaque
-data:
-  oauth: {{ .Values.secrets.github.token }}
+spec:
+  - name: oauth
+    from: {{ .Values.credstashSecrets.githubToken.key | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.githubToken.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.githubToken.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: credstash.local/v1
+kind: CredStashSecret
 metadata:
   name: oauth-config
-type: Opaque
-data:
-  secret: {{ .Values.secrets.prow.oauthconfig }}
+spec:
+  - name: secret
+    from: {{ .Values.credstashSecrets.prowOauthConfig.key | quote | b64enc }}
+    table: {{ .Values.credstashSecrets.prowOauthConfig.table | default .Values.credstashSecrets.defaultTable | quote | b64enc }}
+    version: {{ .Values.credstashSecrets.prowOauthConfig.version | default .Values.credstashSecrets.defaultVersion | quote | b64enc }}
 ---
 apiVersion: v1
 kind: Secret

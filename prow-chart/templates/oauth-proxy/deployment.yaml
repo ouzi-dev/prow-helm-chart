@@ -4,7 +4,6 @@ metadata:
   labels:
     k8s-app: oauth2-proxy
   name: oauth2-proxy
-  namespace: {{ .Values.oauthproxy.namespace }}
 spec:
   replicas: 1
   selector:

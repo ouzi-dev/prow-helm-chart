@@ -6,7 +6,6 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: nginx
   name: oauth2-proxy
-  namespace: {{ .Values.oauthproxy.namespace }}
 spec:
   rules:
   - host: {{ .Values.baseurl }}

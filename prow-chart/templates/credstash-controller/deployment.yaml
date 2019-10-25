@@ -1,9 +1,7 @@
-{{ if .Values.credstash.enabled }}
 apiVersion: extensions/v1beta1 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
 metadata:
   name: credstash-controller
-  namespace: {{ .Values.credstash.namespace }}
 spec:
   replicas: 1
   selector:
@@ -39,4 +37,3 @@ spec:
             secretKeyRef:
               name: credstash-controller
               key: CREDSTASH_AWS_DEFAULT_REGION
-{{ end }}
