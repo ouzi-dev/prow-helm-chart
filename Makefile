@@ -18,6 +18,7 @@ clean:
 
 .PHONY: add-repos
 add-repos:
+	helm init --client-only
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	helm repo add jetstack https://charts.jetstack.io
 
@@ -33,6 +34,7 @@ get-deps: add-repos update-repos
 # see: https://github.com/helm/helm/issues/6505 
 .PHONY: validate
 validate: get-deps
+	helm init --client-only
 	helm template prow \
 	--namespace prow \
 	--debug \
