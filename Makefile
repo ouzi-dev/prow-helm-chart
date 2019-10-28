@@ -44,7 +44,7 @@ validate: get-deps
 	./${CHART_NAME}
 
 .PHONY: package
-package: clean get-deps
+package: clean add-repos
 	@helm package \
 	--version=$(CHART_VERSION) \
 	--dependency-update \
