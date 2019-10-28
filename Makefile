@@ -60,8 +60,7 @@ package: clean add-repos
 .PHONY: push
 push: 
 	helm repo add ouzi $(HELM_REPO)
-	helm gcs push $(CHART_DIST)/$(CHART_NAME)-$(CHART_VERSION).tgz ouzi --debug 
-
+	helm gcs push $(CHART_DIST)/$(CHART_NAME)-$(CHART_VERSION).tgz ouzi
 .PHONY: lint
 lint:
 	helm lint ./$(CHART_NAME)	
