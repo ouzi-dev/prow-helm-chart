@@ -1,15 +1,26 @@
-VERSION ?= 0.0.0
-HELM_EXPERIMENTAL_OCI ?= 1
-export HELM_EXPERIMENTAL_OCI  
+CHART_NAME ?= prow
+CHART_VERSION ?= 0.0.0
+CHART_DIST ?= $(CHART_NAME)/dist
+HELM_REPO ?= gs://ouzi-helm-charts
+
+.PHONY: setup
+setup:
+	helm plugin install https://github.com/hayorov/helm-gcs --version 0.2.1
+
+.PHONY: init
+init:
+	helm gcs init $(HELM_REPO)
+	helm repo add ouzi $(HELM_REPO)
 
 .PHONY: clean
 clean:
-	rm -rf prow-charts/charts
+	rm -rf $(CHART_NAME)/charts
 
 .PHONY: add-repos
 add-repos:
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	helm repo add jetstack https://charts.jetstack.io
+	helm repo add ouzi $(HELM_REPO)
 
 .PHONY: update-repos
 update-repos:
@@ -17,7 +28,7 @@ update-repos:
 
 .PHONY: get-deps
 get-deps: add-repos update-repos
-	helm dependency update ./prow-chart
+	helm dependency update ./${CHART_NAME}
 
 # does not work without explicitly specifying the api version
 # see: https://github.com/helm/helm/issues/6505 
@@ -31,15 +42,15 @@ validate: get-deps
 	-a monitoring.coreos.com/v1 \
 	-a apiextensions.k8s.io/v1beta1 \
 	-a credstash.local/v1 \
-	./prow-chart
+	./${CHART_NAME}
 
 .PHONY: package
 package: clean get-deps
 	@helm package \
-	--version=$(VERSION) \
+	--version=$(CHART_VERSION) \
 	--dependency-update \
-	--destination dist/ \
-	./prow-chart
+	--destination $(CHART_DIST) \
+	./$(CHART_NAME)
 
 # from https://github.com/helm/helm/issues/5861 
 # helm package mychart
@@ -48,14 +59,12 @@ package: clean get-deps
 # docker login gcr.io/my-gcp-project/mychart
 # helm chart push  gcr.io/my-gcp-project/mychart
 .PHONY: push
-push: package
-	helm chart save ./prow-chart gcr.io/ouzi-helm-charts/prow-chart:$(VERSION)
-	docker login gcr.io/ouzi-helm-charts/prow-chart
-	helm chart push gcr.io/ouzi-helm-charts/prow-chart:$(VERSION)
+push: 
+	helm gcs push $(CHART_DIST)/$(CHART_NAME)-$(CHART_VERSION).tgz ouzi --debug 
 
 .PHONY: lint
 lint:
-	helm lint ./prow-chart	
+	helm lint ./$(CHART_NAME)	
 
 .PHONY: semantic-release
 semantic-release:
