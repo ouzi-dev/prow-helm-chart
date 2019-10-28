@@ -20,7 +20,6 @@ clean:
 add-repos:
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	helm repo add jetstack https://charts.jetstack.io
-	helm repo add ouzi $(HELM_REPO)
 
 .PHONY: update-repos
 update-repos:
@@ -60,6 +59,7 @@ package: clean get-deps
 # helm chart push  gcr.io/my-gcp-project/mychart
 .PHONY: push
 push: 
+	helm repo add ouzi $(HELM_REPO)
 	helm gcs push $(CHART_DIST)/$(CHART_NAME)-$(CHART_VERSION).tgz ouzi --debug 
 
 .PHONY: lint
