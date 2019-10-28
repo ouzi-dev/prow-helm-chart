@@ -45,7 +45,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "make package VERSION=v${nextRelease.version}"
+          "prepareCmd": "make setup package push CHART_VERSION=v${nextRelease.version}"
         }
       ],
       [
@@ -53,7 +53,7 @@
         {
           "assets": [
             {
-              "path": "dist/*.tgz"
+              "path": "prow/dist/*.tgz"
             }
           ],
           "successComment": "This ${issue.pull_request ? 'pull request' : 'issue'} is included in version ${nextRelease.version}",

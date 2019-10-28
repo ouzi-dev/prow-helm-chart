@@ -1,6 +1,16 @@
-# prow-helm-chart
+# prow-helm-chart <!-- omit in toc -->
 
 Helm chart to get Prow and everything needed up and running on Kubernetes.
+
+- [Overview](#overview)
+- [Features](#features)
+- [Install](#install)
+  - [Using the GitHub Release](#using-the-github-release)
+  - [Using the Helm repo](#using-the-helm-repo)
+- [Requirements](#requirements)
+- [Componenets](#componenets)
+  - [Prow components](#prow-components)
+  - [Auxiliary Cluster components](#auxiliary-cluster-components)
 
 ## Overview 
 
@@ -13,10 +23,26 @@ This helm chart will install all the necessary components to have a working [Pro
 - Certificates for all ingress are automatically taken care of
   - using [cert-manager](https://github.com/jetstack/cert-manager)
 - Fully working Prow
-  - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow-chart/values.yaml)
-- Helm package published in the releases for easy install - no registry needed 
-  - `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-chart-${RELEASE}.tgz`
+  - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow/values.yaml)
 - Comes with a `credstash` controller which will fetch your secrets from [credstash](https://github.com/fugue/credstash) and create equivalent Secret objects. That way you can use your exiting credstash secrets safely in Prow as well. 
+
+## Install
+
+### Using the GitHub Release
+
+The Helm package is published in the releases for easy install - no registry needed jsut run the following command:
+
+ `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-${RELEASE}.tgz`
+
+### Using the Helm repo
+
+Just add our Helm repo
+
+`helm repo add ouzi https://ouzi-helm-charts.storage.googleapis.com`
+
+and then install as normal
+
+`helm install ouzi/prow`
 
 ## Requirements
 
@@ -73,9 +99,10 @@ We assume that the cluster this chart will be installed in is dedicated to Prow.
   ```
 - [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
 
-### Auxiliary Cluster component
+### Auxiliary Cluster components
 
 - [cert-manager](https://github.com/jetstack/cert-manager): Controller that will automatically create and renew any TLS Certificates. It comes preconfigured for dealing with all Prow ingress TLS certificates.
 - [nginx-ingress](https://github.com/kubernetes/ingress-nginx): Controller that manages the ingress routes using NGINX
 - [oauth2-proxy](https://github.com/pusher/oauth2_proxy): A reverse proxy we use to authN deck and any other Prow ingress endpoints using GitHub
+- [credstash-controller](https://github.com/fugue/credstash): A controller that enables us to load secrets from credstash into kubernetes thus avoiding having to store them in version control. The controller used currently is lacking some features - we might revisit this at some point later
 

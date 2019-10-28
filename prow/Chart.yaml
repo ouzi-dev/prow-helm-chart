@@ -1,5 +1,5 @@
-apiVersion: v2
-name: prow-chart
+apiVersion: v1
+name: prow
 description: A Helm chart for Prow 
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -18,20 +18,3 @@ version: 0.0.0
 
 # Uses the Prow version
 appVersion: v20191017
-
-dependencies:
-  - name: external-dns
-    version: 2.9.0
-    repository: https://kubernetes-charts.storage.googleapis.com/
-    tags:
-      - external-dns 
-  - name: cert-manager
-    version: v0.11.0
-    repository:  https://charts.jetstack.io
-    tags:
-      - cert-manager
-  - name: nginx-ingress
-    version: 1.24.3
-    repository: https://kubernetes-charts.storage.googleapis.com/
-    tags:
-      - nginx-ingress
