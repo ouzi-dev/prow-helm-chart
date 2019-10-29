@@ -650,3 +650,8 @@ data:
           target: both
           prowPlugin: shrug
           addedBy: humans
+        - color: e50ef0
+          description: Denotes a PR that was already included in a release
+          name: "released"
+          target: both
+          addedBy: anyone
