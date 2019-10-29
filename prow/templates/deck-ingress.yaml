@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  {{- with .Values.deck.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: prow
+spec:
+  rules:
+  - host: {{ quote .Values.baseurl }}
+    http:
+      paths:
+      - backend:
+          serviceName: deck
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - {{ quote .Values.baseurl }}
+    secretName: deck-tls

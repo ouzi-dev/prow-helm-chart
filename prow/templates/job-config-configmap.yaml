@@ -1,0 +1,7 @@
+{{ if .Release.IsInstall }}
+apiVersion: v1
+data:
+kind: ConfigMap
+metadata:
+  name: job-config
+{{ end}}

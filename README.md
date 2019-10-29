@@ -3,10 +3,8 @@
 Helm chart to get Prow and everything needed up and running on Kubernetes.
 
 - [Overview](#overview)
-- [Features](#features)
 - [Install](#install)
   - [Using the GitHub Release](#using-the-github-release)
-  - [Using the Helm repo](#using-the-helm-repo)
 - [Requirements](#requirements)
 - [Componenets](#componenets)
   - [Prow components](#prow-components)
@@ -16,15 +14,6 @@ Helm chart to get Prow and everything needed up and running on Kubernetes.
 
 This helm chart will install all the necessary components to have a working [Prow](https://github.com/kubernetes/test-infra/tree/master/prow) on Kubernetes.
 
-## Features
-
-- All ingress' are behind a reversy proxy with authN via GitHub 
-  - using [oauth2-proxy](https://github.com/pusher/oauth2_proxy)
-- Certificates for all ingress are automatically taken care of
-  - using [cert-manager](https://github.com/jetstack/cert-manager)
-- Fully working Prow
-  - All Prow components are installed in full and can be updated using the provided fields in the [values.yaml](prow/values.yaml)
-- Comes with a `credstash` controller which will fetch your secrets from [credstash](https://github.com/fugue/credstash) and create equivalent Secret objects. That way you can use your exiting credstash secrets safely in Prow as well. 
 
 ## Install
 
@@ -33,16 +22,6 @@ This helm chart will install all the necessary components to have a working [Pro
 The Helm package is published in the releases for easy install - no registry needed jsut run the following command:
 
  `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-${RELEASE}.tgz`
-
-### Using the Helm repo
-
-Just add our Helm repo
-
-`helm repo add ouzi https://ouzi-helm-charts.storage.googleapis.com`
-
-and then install as normal
-
-`helm install ouzi/prow`
 
 ## Requirements
 

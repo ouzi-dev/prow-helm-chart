@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ghproxy
+  labels:
+    app: ghproxy
+spec:
+  replicas: {{ .Values.ghproxy.replicas }}
+  template:
+    metadata:
+      labels:
+        app: ghproxy
+    spec:
+      containers:
+      - name: ghproxy
+        image: {{ .Values.ghproxy.image }}
+        args:
+        - --cache-dir=/cache
+        - --cache-sizeGB={{ .Values.ghproxy.cachesizeGB }}
+        - --push-gateway=pushgateway
+        - --serve-metrics=true
+        ports:
+        - containerPort: 8888
+        - containerPort: 9090
+        volumeMounts:
+        - name: cache
+          mountPath: /cache
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: ghproxy

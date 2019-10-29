@@ -1,0 +1,14 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  labels:
+    app: ghproxy
+  name: ghproxy
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ghproxy.cache.sizeGB | add 1 }}Gi
+  storageClassName: {{ .Values.ghproxy.cache.storageClassName }}

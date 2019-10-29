@@ -45,7 +45,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "make setup package push CHART_VERSION=v${nextRelease.version}"
+          "prepareCmd": "make package CHART_VERSION=v${nextRelease.version}"
         }
       ],
       [
