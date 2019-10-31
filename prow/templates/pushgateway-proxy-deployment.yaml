@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pushgateway-proxy
+  labels:
+    app: pushgateway-proxy
+spec:
+  replicas: {{ .Values.pushgateway.proxy.replicas }}
+  template:
+    metadata:
+      labels:
+        app: pushgateway-proxy
+    spec:
+      containers:
+      - name: nginx
+        ports:
+          - name: http
+            containerPort: 8081
+        image: {{ .Values.pushgateway.proxy.image }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/
+      volumes:
+      - name: config-volume
+        configMap:
+          name: pushgateway-proxy-config

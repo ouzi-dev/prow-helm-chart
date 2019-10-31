@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  {{- with .Values.hook.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: hook
+spec:
+  rules:
+  - host: {{ quote .Values.hook.ingress.host }}
+    http:
+      paths:
+      - backend:
+          serviceName: hook
+          servicePort: 8888
+        path: /hook
+  tls:
+  - hosts:
+    - {{ quote .Values.hook.ingress.host }}
+    secretName: {{ quote .Values.hook.ingress.host | replace "." "_" }}

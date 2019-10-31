@@ -1,0 +1,50 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: plank
+  labels:
+    app: plank
+spec:
+  replicas: 1 # Do not scale up.
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: plank
+    spec:
+      serviceAccountName: "plank"
+      containers:
+      - name: plank
+        image: {{ quote .Values.plank.image }}
+        args:
+        - --dry-run=false
+        - --config-path=/etc/config/config.yaml
+        - --skip-report=true
+        - --github-endpoint=http://ghproxy
+#        - --github-endpoint=https://api.github.com
+        - --job-config-path=/etc/job-config
+        ports:
+          - name: metrics
+            containerPort: 9090
+        volumeMounts:
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: {{ .Values.secrets.githubToken }}
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config

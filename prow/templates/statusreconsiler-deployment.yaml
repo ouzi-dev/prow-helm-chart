@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: statusreconciler
+  labels:
+    app: statusreconciler
+spec:
+  replicas: {{ .Values.statusreconciler.replicas }}
+  template:
+    metadata:
+      labels:
+        app: statusreconciler
+    spec:
+      serviceAccountName: statusreconciler
+      terminationGracePeriodSeconds: 180
+      containers:
+      - name: statusreconciler
+        image: {{ quote .Values.statusreconciler.image }}
+        args:
+        - --dry-run=false
+        - --continue-on-error=true
+        - --plugin-config=/etc/plugins/plugins.yaml
+        - --config-path=/etc/config/config.yaml
+        - --github-token-path=/etc/github/oauth
+        - --job-config-path=/etc/job-config
+        volumeMounts:
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: job-config
+          mountPath: /etc/job-config
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          secretName: {{ .Values.secrets.githubToken }}
+      - name: config
+        configMap:
+          name: config
+      - name: job-config
+        configMap:
+          name: job-config
+      - name: plugins
+        configMap:
+          name: plugins
