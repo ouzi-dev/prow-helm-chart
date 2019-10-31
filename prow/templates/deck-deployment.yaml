@@ -23,11 +23,13 @@ spec:
       - name: deck
         image: {{ quote .Values.deck.image }}
         args:
+        - --rerun-creates-job
         - --config-path=/etc/config/config.yaml
         - --tide-url=http://tide/
         - --hook-url=http://hook:8888/plugin-help
-        - --redirect-http-to={{ quote .Values.baseurl }}
+        - --redirect-http-to={{ quote .Values.deck.host }}
         - --config-path=/etc/config/config.yaml
+        - --cookie-secret=/etc/cookie/secret
         - --job-config-path=/etc/job-config
         - --oauth-url=/github-login
         - --spyglass=true

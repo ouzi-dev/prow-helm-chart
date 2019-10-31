@@ -31,7 +31,7 @@ spec:
           volumes:
           - name: oauth
             secret:
-              secretName: {{ .Values.secrets.oautToken }}
+              secretName: {{ .Values.secrets.githubToken }}
           - name: config
             configMap:
               name: label-config

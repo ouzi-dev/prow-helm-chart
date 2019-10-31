@@ -35,7 +35,7 @@ spec:
          volumes:
          - name: oauth
            secret:
-             secretName: {{ .Values.secrets.oauthConfig }}
+             secretName: {{ .Values.secrets.githubToken }}
          - name: config
            configMap:
              name: config

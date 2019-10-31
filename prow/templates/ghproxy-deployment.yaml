@@ -16,7 +16,7 @@ spec:
         image: {{ .Values.ghproxy.image }}
         args:
         - --cache-dir=/cache
-        - --cache-sizeGB={{ .Values.ghproxy.cachesizeGB }}
+        - --cache-sizeGB={{ .Values.ghproxy.cache.sizeGB }}
         - --push-gateway=pushgateway
         - --serve-metrics=true
         ports:

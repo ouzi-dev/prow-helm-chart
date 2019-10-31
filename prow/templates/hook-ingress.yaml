@@ -1,14 +1,14 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  {{- with .Values.deck.ingress.annotations }}
+  {{- with .Values.hook.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   name: hook
 spec:
   rules:
-  - host: {{ quote .Values.baseurl }}
+  - host: {{ quote .Values.hook.ingress.host }}
     http:
       paths:
       - backend:
@@ -17,5 +17,5 @@ spec:
         path: /hook
   tls:
   - hosts:
-    - {{ quote .Values.baseurl }}
-    secretName: deck-tls   
+    - {{ quote .Values.hook.ingress.host }}
+    secretName: {{ quote .Values.hook.ingress.host | replace "." "_" }}

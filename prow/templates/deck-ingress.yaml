@@ -5,10 +5,10 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  name: prow
+  name: deck
 spec:
   rules:
-  - host: {{ quote .Values.baseurl }}
+  - host: {{ quote .Values.deck.ingress.host }}
     http:
       paths:
       - backend:
@@ -17,5 +17,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - {{ quote .Values.baseurl }}
-    secretName: deck-tls
+    - {{ quote .Values.deck.ingress.host }}
+    secretName: {{ .Values.deck.ingress.host | replace "." "-" }}
