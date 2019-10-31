@@ -21,7 +21,7 @@ hook:
   image: gcr.io/k8s-prow/hook:v20191028-a687a71be
   replicas: 1
   ingress:
-    host: 
+    host: prow.test-infra.ouzi.io
     annotations: 
       cert-manager.io/cluster-issuer: letsencrypt-prod
       ingress.kubernetes.io/ssl-redirect: "true"
@@ -38,13 +38,13 @@ deck:
   image: gcr.io/k8s-prow/deck:v20191028-a687a71be
   replicas: 1
   ingress:
-    host: 
+    host: prow.test-infra.ouzi.io
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       ingress.kubernetes.io/ssl-redirect: "true"
       kubernetes.io/ingress.class: nginx
-      nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
-      nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+      nginx.ingress.kubernetes.io/auth-url: "https://oauth2.test-infra.ouzi.io/oauth2/auth"
+      nginx.ingress.kubernetes.io/auth-signin: "https://oauth2.test-infra.ouzi.io/oauth2/start?rd=$escaped_request_uri"
 
 horologium:
   image: gcr.io/k8s-prow/horologium:v20191028-a687a71be
