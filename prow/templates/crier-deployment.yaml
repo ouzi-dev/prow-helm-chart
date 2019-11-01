@@ -18,7 +18,7 @@ spec:
         image: {{ .Values.crier.image }}
         args:
         - --github-workers=1
-{{ if .Values.slackToken }}        
+{{ if .Values.slackToken }}
         - --slack-workers=1
         - --slack-token-file=/etc/slack/token
 {{ end }}
@@ -37,7 +37,7 @@ spec:
         - name: oauth
           mountPath: /etc/github
           readOnly: true
-{{ if .Values.slackToken }}        
+{{ if .Values.slackToken }}
         - name: slack
           mountPath: /etc/slack
           readOnly: true
@@ -52,7 +52,7 @@ spec:
       - name: oauth
         secret:
           secretName: {{ .Values.secrets.githubToken }}
-{{ if .Values.slackToken }}        
+{{ if .Values.slackToken }}
       - name: slack
         secret:
           secretName: {{ .Values.secrets.slackToken }}

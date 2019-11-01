@@ -24,7 +24,9 @@ spec:
         image: {{ quote .Values.hook.image }}
         imagePullPolicy: IfNotPresent
         args:
+{{ if .Values.slackToken }}
         - --slack-token-file=/etc/slack/token
+{{ end }}
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=http://ghproxy
@@ -36,9 +38,11 @@ spec:
           - name: metrics
             containerPort: 9090
         volumeMounts:
+{{ if .Values.slackToken }}
         - name: slack
           mountPath: /etc/slack
-          readOnly: true 
+          readOnly: true
+{{ end }}
         - name: hmac
           mountPath: /etc/webhook
           readOnly: true
@@ -68,9 +72,11 @@ spec:
           periodSeconds: 3
           timeoutSeconds: 600
       volumes:
+{{ if .Values.slackToken }}
       - name: slack
         secret:
           secretName: {{ .Values.secrets.slackToken }}
+{{ end }}
       - name: hmac
         secret:
           secretName: hmac-token
