@@ -83,4 +83,3 @@ The chart is developed using Helmv3 and we will not support any Helm v2
 - [nginx-ingress](https://github.com/kubernetes/ingress-nginx): Controller that manages the ingress routes using NGINX
 - [oauth2-proxy](https://github.com/pusher/oauth2_proxy): A reverse proxy we use to authN deck and any other Prow ingress endpoints using GitHub
 - [credstash-controller](https://github.com/fugue/credstash): A controller that enables us to load secrets from credstash into kubernetes thus avoiding having to store them in version control. The controller used currently is lacking some features - we might revisit this at some point later
-
