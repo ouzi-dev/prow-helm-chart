@@ -76,10 +76,3 @@ The chart is developed using Helmv3 and we will not support any Helm v2
     deleteAfter: 2017-01-01T13:00:00Z
   ```
 - [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
-
-### Auxiliary Cluster components
-
-- [cert-manager](https://github.com/jetstack/cert-manager): Controller that will automatically create and renew any TLS Certificates. It comes preconfigured for dealing with all Prow ingress TLS certificates.
-- [nginx-ingress](https://github.com/kubernetes/ingress-nginx): Controller that manages the ingress routes using NGINX
-- [oauth2-proxy](https://github.com/pusher/oauth2_proxy): A reverse proxy we use to authN deck and any other Prow ingress endpoints using GitHub
-- [credstash-controller](https://github.com/fugue/credstash): A controller that enables us to load secrets from credstash into kubernetes thus avoiding having to store them in version control. The controller used currently is lacking some features - we might revisit this at some point later
