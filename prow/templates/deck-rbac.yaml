@@ -31,7 +31,7 @@ subjects:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: {{ .podNamespace }}
+  namespace: {{ .Values.prowjobNamespace }}
   name: "deck"
 rules:
   - apiGroups:
@@ -44,7 +44,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: {{ .podNamespace }}
+  namespace: {{ .Values.prowjobNamespace }}
   name: "deck"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
