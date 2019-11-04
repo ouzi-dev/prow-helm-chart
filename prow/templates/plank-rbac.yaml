@@ -17,6 +17,13 @@ rules:
       - create
       - list
       - update
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: {{ .podNamespace }}
+  name: "plank"
+rules:
   - apiGroups:
       - ""
     resources:
@@ -24,7 +31,7 @@ rules:
     verbs:
       - create
       - delete
-      - list 
+      - list
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -37,3 +44,17 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "plank"
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: {{ .podNamespace }}
+  name: "plank"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "plank"
+subjects:
+- kind: ServiceAccount
+  name: "plank"
+  namespace: {{ .Release.Namespace }}
