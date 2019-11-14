@@ -18,4 +18,4 @@ spec:
   tls:
   - hosts:
     - {{ quote .Values.deck.ingress.host }}
-    secretName: {{ .Values.deck.ingress.host }}
+    secretName: {{ quote .Values.deck.ingress.host }}
