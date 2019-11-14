@@ -18,4 +18,4 @@ spec:
   tls:
   - hosts:
     - {{ quote .Values.hook.ingress.host }}
-    secretName: {{ quote .Values.hook.ingress.host | replace "." "_" }}
+    secretName: {{ quote .Values.hook.ingress.host }}
