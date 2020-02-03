@@ -71,6 +71,12 @@ labelsync:
   image: gcr.io/k8s-prow/label_sync:v20200128-8dae29413
   schedule: 0 5 * * * # Every day at 5AM
 
+# requires tekton to work - 
+# we will install it part of the chart in a later revision
+pipeline:
+  # image: gcr.io/k8s-prow/pipeline:v20200131-19ad23dfd
+  image: gcr.io/k8s-prow/pipeline:v20200128-8dae29413
+
 pushgateway:
   image: prom/pushgateway:v0.4.0
   replicas: 1
