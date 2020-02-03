@@ -18,7 +18,7 @@ oauthproxy:
   image: quay.io/pusher/oauth2_proxy:v3.1.0
 
 hook:
-  image: gcr.io/k8s-prow/hook:v20191028-a687a71be
+  image: gcr.io/k8s-prow/hook:v20200128-8dae29413
   replicas: 1
   ingress:
     host: prow.test-infra.ouzi.io
@@ -28,14 +28,14 @@ hook:
       kubernetes.io/ingress.class: nginx  
 
 plank:
-  image: gcr.io/k8s-prow/plank:v20191028-a687a71be
+  image: gcr.io/k8s-prow/plank:v20200128-8dae29413
 
 sinker:
-  image: gcr.io/k8s-prow/sinker:v20191028-a687a71be
+  image: gcr.io/k8s-prow/sinker:v20200128-8dae29413
   replicas: 1
 
 deck:
-  image: gcr.io/k8s-prow/deck:v20191028-a687a71be
+  image: gcr.io/k8s-prow/deck:v20200128-8dae29413
   replicas: 1
   ingress:
     host: prow.test-infra.ouzi.io
@@ -47,28 +47,28 @@ deck:
       nginx.ingress.kubernetes.io/auth-signin: "https://oauth2.test-infra.ouzi.io/oauth2/start?rd=/redirect/$http_host$request_uri"
 
 horologium:
-  image: gcr.io/k8s-prow/horologium:v20191028-a687a71be
+  image: gcr.io/k8s-prow/horologium:v20200128-8dae29413
 
 tide:
-  image: gcr.io/k8s-prow/tide:v20191028-a687a71be
+  image: gcr.io/k8s-prow/tide:v20200128-8dae29413
 
 statusreconciler:
-  image: gcr.io/k8s-prow/status-reconciler:v20191028-a687a71be
+  image: gcr.io/k8s-prow/status-reconciler:v20200128-8dae29413
   replicas: 1
 
 needsrebase:
-  image: gcr.io/k8s-prow/needs-rebase:v20191028-a687a71be
+  image: gcr.io/k8s-prow/needs-rebase:v20200128-8dae29413
 
 branchprotector:
-  image: gcr.io/k8s-prow/branchprotector:v20191028-a687a71be
+  image: gcr.io/k8s-prow/branchprotector:v20200128-8dae29413
   schedule: 12 * * * * # Every hour at 12 minutes past the hour
   
 crier:
-  image: gcr.io/k8s-prow/crier:v20191028-a687a71be
+  image: gcr.io/k8s-prow/crier:v20200128-8dae29413
   replicas: 1
 
 labelsync:
-  image: gcr.io/k8s-prow/label_sync:v20191028-a687a71be
+  image: gcr.io/k8s-prow/label_sync:v20200128-8dae29413
   schedule: 0 5 * * * # Every day at 5AM
 
 pushgateway:
@@ -79,7 +79,7 @@ pushgateway:
     replicas: 1
 
 ghproxy:
-  image: gcr.io/k8s-prow/ghproxy:v20191028-a687a71be
+  image: gcr.io/k8s-prow/ghproxy:v20200128-8dae29413
   replicas: 1
   cache:
     sizeGB: 19
