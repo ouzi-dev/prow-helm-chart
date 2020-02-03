@@ -1,7 +1,6 @@
 CHART_NAME ?= prow
 CHART_VERSION ?= 0.0.0
 CHART_DIST ?= $(CHART_NAME)/dist
-HELM_REPO ?= gs://ouzi-helm-charts
 
 .PHONY: clean
 clean:
