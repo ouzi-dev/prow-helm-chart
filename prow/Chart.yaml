@@ -17,4 +17,4 @@ type: application
 version: 0.0.0
 
 # Uses the Prow version
-appVersion: v20200128-8dae29413
+appVersion: v20200203-cae3cccf8

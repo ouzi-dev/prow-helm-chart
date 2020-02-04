@@ -8,7 +8,7 @@ Helmv3 chart to get Prow and everything needed up and running on Kubernetes.
 - [Requirements](#requirements)
 - [Componenets](#componenets)
   - [Prow components](#prow-components)
-  - [Auxiliary Cluster components](#auxiliary-cluster-components)
+- [Upgrading to a new release of Prow](#upgrading-to-a-new-release-of-prow)
 
 ## Overview 
 
@@ -76,3 +76,9 @@ The chart is developed using Helmv3 and we will not support any Helm v2
     deleteAfter: 2017-01-01T13:00:00Z
   ```
 - [ghproxy](https://github.com/kubernetes/test-infra/blob/master/ghproxy/README.md): A reverse proxy HTTP cache optimized for use with the GitHub API. ghProxy is designed to reduce API token usage by allowing many components to share a single [ghCache](https://github.com/kubernetes/test-infra/tree/master/ghproxy/ghcache)
+
+## Upgrading to a new release of Prow
+
+To upgrade to a new release of Prow, run `gcloud container images list-tags gcr.io/k8s-prow/plank --limit="10" --format='value(tags)' | grep -o -E 'v[^,]+'` to get the 10 most recent tags. Pick the latest and replace all image tags in the values.yaml. Do not forget to update the Chart.yaml appVersion.
+
+You also need to check about deprecated flags in all of the components as well as changes with rbac.
