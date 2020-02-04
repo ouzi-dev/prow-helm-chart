@@ -5,7 +5,7 @@ prowbucketname: ouzidev-testinfra-252513-prow-artefacts
 
 secrets:
   slackToken: slack-token
-  githubToken: oauth-token
+  githubToken: github-token
   oauthConfig: oauth-config
   bucketGcsCredentials: prow-bucket-gcs-credentials
 

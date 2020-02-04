@@ -33,7 +33,8 @@ spec:
         - --job-config-path=/etc/job-config
         - --oauth-url=/github-login
         - --spyglass=true
-        - --github-token-path=/etc/github/secret
+        - --github-token-path=/etc/github/oauth
+        - --github-oauth-config-file=/etc/githuboauth/secret
         ports:
           - name: http
             containerPort: 8080
@@ -47,6 +48,9 @@ spec:
           mountPath: /etc/job-config
           readOnly: true
         - name: oauth-config
+          mountPath: /etc/githuboauth
+          readOnly: true
+        - name: oauth-token
           mountPath: /etc/github
           readOnly: true
         - name: cookie-secret
@@ -75,6 +79,9 @@ spec:
       - name: oauth-config
         secret:
             secretName: {{ .Values.secrets.oauthConfig }}
+      - name: oauth-token
+        secret:
+            secretName: {{ .Values.secrets.githubToken }}
       - name: cookie-secret
         secret:
             secretName: deck-cookie
