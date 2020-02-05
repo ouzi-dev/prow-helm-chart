@@ -10,7 +10,7 @@
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/exec": "^5.0.0",
     "@semantic-release/github": "^7.0.2",
-    "@semantic-release/release-notes-generator": "^7.3.5",
+    "@semantic-release/release-notes-generator": "^9.0.0",
     "fstream": "^1.0.12",
     "semantic-release": "^16.0.0-beta.24",
     "tar": "^6.0.1",
