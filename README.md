@@ -20,7 +20,16 @@ This helm chart will install [Prow](https://github.com/kubernetes/test-infra/tre
 
 The Helm package is published in the releases for easy install - no registry needed, just run the following command:
 
- `helm install prow https://github.com/ouzi-dev/prow-helm-chart/archive/prow-${RELEASE}.tgz -f values.yaml` 
+ ```
+	@helm upgrade \
+		prow \
+		https://github.com/ouzi-dev/prow-helm-chart/releases/download/$(PROW_CHART_VERSION)/prow-$(PROW_CHART_VERSION).tgz \
+		--install \
+		--wait \
+    --atomic \
+		--namespace prow \
+		--values values.yaml 	 
+ ``` 
 
 ## Requirements
 
