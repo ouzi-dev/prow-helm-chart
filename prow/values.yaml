@@ -93,5 +93,3 @@ ghproxy:
 
 monitoring:
   enabled: true
-
-seedConfig: false
