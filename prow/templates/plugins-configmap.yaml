@@ -1,11 +1,10 @@
+{{ if or .Release.IsInstall .seedConfig  }}
+---
 apiVersion: v1
 data:
 kind: ConfigMap
 metadata:
   name: plugins
-  annotations:
-# https://github.com/helm/helm/issues/3053#issuecomment-518403351
-    "helm.sh/hook": "pre-install"
-    "helm.sh/hook-delete-policy": "before-hook-creation"
 data:
   plugins.yaml: |-
+{{ end }}

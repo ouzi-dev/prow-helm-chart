@@ -1,13 +1,12 @@
+{{ if or .Release.IsInstall .seedConfig  }}
+---
 apiVersion: v1
 data:
 kind: ConfigMap
 metadata:
   name: config
-  annotations:
-# https://github.com/helm/helm/issues/3053#issuecomment-518403351
-    "helm.sh/hook": "pre-install"
-    "helm.sh/hook-delete-policy": "before-hook-creation"
 data:
   config.yaml: |-
     prowjob_namespace: {{ .Values.prowjobNamespace }}
     pod_namespace: {{ .Values.podNamespace }}
+{{ end }}
