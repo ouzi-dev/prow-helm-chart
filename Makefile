@@ -2,6 +2,8 @@ CHART_NAME ?= prow
 CHART_VERSION ?= 0.0.0
 CHART_DIST ?= $(CHART_NAME)/dist
 
+KUBEVAL_OPTS ?= --strict --kubernetes-version 1.16.0 --ignore-missing-schemas
+
 .PHONY: clean
 clean:
 	rm -rf $(CHART_NAME)/charts
@@ -18,7 +20,7 @@ validate:
 	-a monitoring.coreos.com/v1 \
 	-a apiextensions.k8s.io/v1beta1 \
 	-a credstash.local/v1 \
-	./${CHART_NAME}
+	./${CHART_NAME} | kubeval $(KUBEVAL_OPTS)	
 
 .PHONY: package
 package: clean 
