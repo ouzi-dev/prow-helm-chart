@@ -15,6 +15,10 @@ spec:
     spec:
       serviceAccountName: "horologium"
       terminationGracePeriodSeconds: 30
+{{- if .Values.horologium.tolerations }}
+      tolerations:
+{{ toYaml .Values.horologium.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: horologium
         image: {{ quote .Values.horologium.image }}

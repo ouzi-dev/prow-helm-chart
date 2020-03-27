@@ -12,6 +12,10 @@ spec:
    spec:
      template:
        spec:
+{{- if .Values.branchprotector.tolerations }}
+         tolerations:
+{{ toYaml .Values.branchprotector.tolerations | indent 9 }}
+{{- end }}
          containers:
          - name: branchprotector
            image: {{ quote .Values.branchprotector.image }}

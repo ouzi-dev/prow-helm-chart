@@ -19,6 +19,10 @@ spec:
     spec:
       serviceAccountName: "hook"
       terminationGracePeriodSeconds: 180
+{{- if .Values.hook.tolerations }}
+      tolerations:
+{{ toYaml .Values.hook.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: hook
         image: {{ quote .Values.hook.image }}

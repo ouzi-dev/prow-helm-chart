@@ -13,6 +13,10 @@ spec:
         app: sinker
     spec:
       serviceAccountName: "sinker"
+{{- if .Values.sinker.tolerations }}
+      tolerations:
+{{ toYaml .Values.sinker.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: sinker
         image: {{ quote .Values.sinker.image }}

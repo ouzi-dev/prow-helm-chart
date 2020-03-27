@@ -13,6 +13,10 @@ spec:
     spec:
       serviceAccountName: crier
       terminationGracePeriodSeconds: 30
+{{- if .Values.crier.tolerations }}
+      tolerations:
+{{ toYaml .Values.crier.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: crier
         image: {{ .Values.crier.image }}

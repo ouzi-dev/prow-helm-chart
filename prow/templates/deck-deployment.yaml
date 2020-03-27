@@ -19,6 +19,10 @@ spec:
     spec:
       serviceAccountName: "deck"
       terminationGracePeriodSeconds: 30
+{{- if .Values.deck.tolerations }}
+      tolerations:
+{{ toYaml .Values.deck.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: deck
         image: {{ quote .Values.deck.image }}

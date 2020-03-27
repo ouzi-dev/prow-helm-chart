@@ -11,6 +11,10 @@ spec:
       labels:
         app: pushgateway-proxy
     spec:
+{{- if .Values.pushgateway.proxy.tolerations }}
+      tolerations:
+{{ toYaml .Values.pushgateway.proxy.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: nginx
         ports:
