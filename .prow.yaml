@@ -1,0 +1,94 @@
+presubmits:
+  - name: test-prow-helm-chart-lint
+    context: test-prow-helm-chart-lint
+    decorate: true
+    clone_uri: "git@github.com:ouzi-dev/prow-helm-chart.git" 
+    always_run: true 
+    skip_report: false 
+    max_concurrency: 1 
+    trigger: "(?m)lint( please)?" 
+    rerun_command: "lint"
+    spec: 
+      containers:
+        - name: "test-prow-helm-chart-lint"
+          imagePullPolicy: IfNotPresent
+          image: quay.io/ouzi/toolbox:0.1.17
+          command:
+            - make
+          args:
+            - lint
+  - name: test-prow-helm-chart-validate
+    context: test-prow-helm-chart-validate
+    decorate: true
+    clone_uri: "git@github.com:ouzi-dev/prow-helm-chart.git" 
+    always_run: true 
+    skip_report: false 
+    max_concurrency: 1 
+    trigger: "(?m)validate( please)?" 
+    rerun_command: "validate"
+    spec: 
+      containers:
+        - name: "test-prow-helm-chart-validate"
+          imagePullPolicy: IfNotPresent
+          image: quay.io/ouzi/toolbox:0.1.17
+          command:
+            - make
+          args:
+            - validate
+  - name: test-prow-helm-chart-package
+    context: test-prow-helm-chart-package
+    decorate: true
+    clone_uri: "git@github.com:ouzi-dev/prow-helm-chart.git" 
+    always_run: true 
+    skip_report: false 
+    max_concurrency: 1 
+    trigger: "(?m)package( please)?" 
+    rerun_command: "package"
+    spec: 
+      containers:
+        - name: "test-prow-helm-chart-package"
+          imagePullPolicy: IfNotPresent
+          image: quay.io/ouzi/toolbox:0.1.17
+          command:
+            - make
+          args:
+            - package 
+            - VERSION=0.0.0
+  - name: test-prow-helm-chart-semrelease-dryrun
+    context: test-prow-helm-chart-semrelease-dryrun
+    decorate: true
+    clone_uri: "git@github.com:ouzi-dev/prow-helm-chart.git" 
+    always_run: true 
+    skip_report: false 
+    max_concurrency: 1 
+    labels:
+      preset-semantic-release: "true"            
+    trigger: "(?m)semrelease-dryrun( please)?" 
+    rerun_command: "semrelease-dryrun"
+    spec: 
+      containers:
+        - name: "test-prow-helm-chart-semrelease-dryrun"
+          imagePullPolicy: IfNotPresent
+          image: quay.io/ouzi/toolbox:0.1.17
+          command:
+            - make
+          args:
+            - semantic-release-dry-run 
+postsubmits:
+  - name: release-prow-helm-chart
+    decorate: true
+    clone_uri: "git@github.com:ouzi-dev/prow-helm-chart.git" 
+    max_concurrency: 1 
+    labels:
+      preset-semantic-release: "true"
+    branches:
+      - master
+    spec: 
+      containers:
+        - name: "release-prow-helm-chart"
+          imagePullPolicy: IfNotPresent
+          image: quay.io/ouzi/toolbox:0.1.17
+          command:
+            - make
+          args:
+            - semantic-release
