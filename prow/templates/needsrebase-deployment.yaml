@@ -12,6 +12,10 @@ spec:
         app: needs-rebase
     spec:
       terminationGracePeriodSeconds: 180
+{{- if .Values.needsrebase.tolerations }}
+      tolerations:
+{{ toYaml .Values.needsrebase.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: needs-rebase
         image: {{ quote .Values.needsrebase.image}}

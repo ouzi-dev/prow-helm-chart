@@ -11,6 +11,10 @@ spec:
       labels:
         app: pushgateway
     spec:
+{{- if .Values.pushgateway.tolerations }}
+      tolerations:
+{{ toYaml .Values.pushgateway.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: pushgateway
         image: {{ .Values.pushgateway.image }}

@@ -12,6 +12,10 @@ spec:
     spec:
       template:
         spec:
+{{- if .Values.labelsync.tolerations }}
+          tolerations:
+{{ toYaml .Values.labelsync.tolerations | indent 12 }}
+{{- end }}
           containers:
             - name: label-sync
               image: {{ quote .Values.labelsync.image }}

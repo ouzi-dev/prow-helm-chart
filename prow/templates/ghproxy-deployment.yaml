@@ -11,6 +11,10 @@ spec:
       labels:
         app: ghproxy
     spec:
+{{- if .Values.ghproxy.tolerations }}
+      tolerations:
+{{ toYaml .Values.ghproxy.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: ghproxy
         image: {{ .Values.ghproxy.image }}

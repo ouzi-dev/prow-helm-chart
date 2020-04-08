@@ -16,6 +16,10 @@ spec:
     spec:
       # use service account to use local cluster and not a remote
       serviceAccountName: prow-pipeline
+{{- if .Values.pipeline.tolerations }}
+      tolerations:
+{{ toYaml .Values.pipeline.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: pipeline
         image: {{ .Values.pipeline.image }}

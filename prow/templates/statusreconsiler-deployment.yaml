@@ -13,6 +13,10 @@ spec:
     spec:
       serviceAccountName: statusreconciler
       terminationGracePeriodSeconds: 180
+{{- if .Values.statusreconciler.tolerations }}
+      tolerations:
+{{ toYaml .Values.statusreconciler.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: statusreconciler
         image: {{ quote .Values.statusreconciler.image }}

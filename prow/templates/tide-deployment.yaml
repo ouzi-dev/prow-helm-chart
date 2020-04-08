@@ -14,6 +14,10 @@ spec:
         app: tide
     spec:
       serviceAccountName: "tide"
+{{- if .Values.tide.tolerations }}
+      tolerations:
+{{ toYaml .Values.tide.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: tide
         image: {{ quote .Values.tide.image }}
