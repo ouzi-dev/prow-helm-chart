@@ -117,6 +117,11 @@ crier:
 labelsync:
   image: gcr.io/k8s-prow/label_sync:v20200203-cae3cccf8
   schedule: 0 5 * * * # Every day at 5AM
+  tolerations:
+    - key: cloud.google.com/gke-preemptible
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
 
 # requires tekton to work - 
 # we will install it part of the chart in a later revision
