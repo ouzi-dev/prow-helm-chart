@@ -10,5 +10,5 @@ metadata:
     "helm.sh/hook-delete-policy": "before-hook-creation"
 data:
   config.yaml: |-
-    prowjob_namespace: {{ .Values.prowjobNamespace }}
+    prowjob_namespace: {{ .Release.Namespace }}
     pod_namespace: {{ .Values.podNamespace }}
