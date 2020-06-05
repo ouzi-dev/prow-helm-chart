@@ -6,6 +6,9 @@ metadata:
     app: pushgateway-proxy
 spec:
   replicas: {{ .Values.pushgateway.proxy.replicas }}
+  selector:
+    matchLabels:
+      app: pushgateway-proxy
   template:
     metadata:
       labels:

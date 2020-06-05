@@ -6,6 +6,9 @@ metadata:
     app: crier
 spec:
   replicas: {{ .Values.crier.replicas }}
+  selector:
+    matchLabels:
+      app: crier
   template:
     metadata:
       labels:

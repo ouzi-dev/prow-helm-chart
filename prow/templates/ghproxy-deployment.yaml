@@ -6,6 +6,9 @@ metadata:
     app: ghproxy
 spec:
   replicas: {{ .Values.ghproxy.replicas }}
+  selector:
+    matchLabels:
+      app: ghproxy
   template:
     metadata:
       labels:
