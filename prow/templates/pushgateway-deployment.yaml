@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pushgateway
@@ -6,6 +6,9 @@ metadata:
     app: pushgateway
 spec:
   replicas: {{ .Values.pushgateway.replicas }}
+  selector:
+    matchLabels:
+      app: pushgateway
   template:
     metadata:
       labels:

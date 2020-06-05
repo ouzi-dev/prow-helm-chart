@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: statusreconciler
@@ -6,6 +6,9 @@ metadata:
     app: statusreconciler
 spec:
   replicas: {{ .Values.statusreconciler.replicas }}
+  selector:
+    matchLabels:
+      app: statusreconciler
   template:
     metadata:
       labels:
