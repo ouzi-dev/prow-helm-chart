@@ -29,6 +29,7 @@ spec:
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
+        - --github-token-path=/etc/github/oauth
         - --gcs-credentials-file=/etc/service-account/service-account.json
         - --history-uri=gs://{{ .Values.prowbucketname }}/tide-history.json
         - --status-path=gs://{{ .Values.prowbucketname }}/tide-status-checkpoint.yaml
