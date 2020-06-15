@@ -4,6 +4,7 @@ Helmv3 chart to get Prow and everything needed up and running on Kubernetes.
 
 - [Overview](#overview)
 - [Install](#install)
+  - [Using the ouzi helm repo](#using-the-ouzi-helm-repo)
   - [Using the GitHub Release](#using-the-github-release)
 - [Requirements](#requirements)
 - [Componenets](#componenets)
@@ -15,6 +16,21 @@ Helmv3 chart to get Prow and everything needed up and running on Kubernetes.
 This helm chart will install [Prow](https://github.com/kubernetes/test-infra/tree/master/prow) on Kubernetes.
 
 ## Install
+
+### Using the Ouzi helm repo
+```
+helm repo add ouzi https://charts.ouzi.io
+helm repo update
+helm upgrade \
+    prow \
+		ouzi/prow \
+		--version (PROW_CHART_VERSION) \
+		--install \
+		--wait \
+    --atomic \
+		--namespace prow \
+		--values values.yaml
+```
 
 ### Using the GitHub Release
 
