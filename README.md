@@ -27,7 +27,7 @@ helm upgrade \
 		--version (PROW_CHART_VERSION) \
 		--install \
 		--wait \
-    --atomic \
+		--atomic \
 		--namespace prow \
 		--values values.yaml
 ```
