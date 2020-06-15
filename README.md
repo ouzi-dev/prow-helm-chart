@@ -22,14 +22,14 @@ This helm chart will install [Prow](https://github.com/kubernetes/test-infra/tre
 helm repo add ouzi https://charts.ouzi.io
 helm repo update
 helm upgrade \
-    prow \
-		ouzi/prow \
-		--version (PROW_CHART_VERSION) \
-		--install \
-		--wait \
-		--atomic \
-		--namespace prow \
-		--values values.yaml
+  prow \
+  ouzi/prow \
+  --version (PROW_CHART_VERSION) \
+  --install \
+  --wait \
+  --atomic \
+  --namespace prow \
+  --values values.yaml
 ```
 
 ### Using the GitHub Release
@@ -37,14 +37,14 @@ helm upgrade \
 The Helm package is published in the releases for easy install - no registry needed, just run the following command:
 
  ```
-	@helm upgrade \
-		prow \
-		https://github.com/ouzi-dev/prow-helm-chart/releases/download/$(PROW_CHART_VERSION)/prow-$(PROW_CHART_VERSION).tgz \
-		--install \
-		--wait \
-		--atomic \
-		--namespace prow \
-		--values values.yaml 	 
+  @helm upgrade \
+    prow \
+    https://github.com/ouzi-dev/prow-helm-chart/releases/download/$(PROW_CHART_VERSION)/prow-$(PROW_CHART_VERSION).tgz \
+    --install \
+    --wait \
+    --atomic \
+    --namespace prow \
+    --values values.yaml 	 
  ``` 
 
 ## Requirements
