@@ -3,6 +3,16 @@ CHART_VERSION ?= 0.0.0
 CHART_DIST ?= $(CHART_NAME)/dist
 
 KUBEVAL_OPTS ?= --strict --kubernetes-version 1.16.0 --ignore-missing-schemas
+HELM_PLUGIN_PUSH_URL := https://github.com/chartmuseum/helm-push
+HELM_PLUGIN_PUSH_VERSION := v0.8.1
+HELM_REPO_URL := https://charts.ouzi.io
+HELM_REPO_NAME := ouzi
+
+.PHONY: push-init
+push-init: 
+	@helm plugin install $(HELM_PLUGIN_PUSH_URL) --version $(HELM_PLUGIN_PUSH_VERSION) || echo "Plugin already installed - nothing to do"
+	@helm repo add $(HELM_REPO_NAME) $(HELM_REPO_URL)
+	@helm repo update
 
 .PHONY: clean
 clean:
@@ -29,6 +39,9 @@ package: clean
 	--dependency-update \
 	--destination $(CHART_DIST) \
 	./$(CHART_NAME)
+
+push: push-init
+	@helm push $(CHART_DIST)/$(CHART_NAME)-$(CHART_VERSION).tgz $(HELM_REPO_NAME)
 
 .PHONY: lint
 lint:
