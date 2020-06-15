@@ -62,7 +62,8 @@ presubmits:
     skip_report: false 
     max_concurrency: 1 
     labels:
-      preset-semantic-release: "true"            
+      preset-semantic-release: "true"
+      preset-ouzi-helm-push: "true"
     trigger: "(?m)semrelease-dryrun( please)?" 
     rerun_command: "semrelease-dryrun"
     spec: 
@@ -81,6 +82,7 @@ postsubmits:
     max_concurrency: 1 
     labels:
       preset-semantic-release: "true"
+      preset-ouzi-helm-push: "true"
     branches:
       - master
     spec: 
