@@ -42,7 +42,7 @@ The Helm package is published in the releases for easy install - no registry nee
 		https://github.com/ouzi-dev/prow-helm-chart/releases/download/$(PROW_CHART_VERSION)/prow-$(PROW_CHART_VERSION).tgz \
 		--install \
 		--wait \
-    --atomic \
+		--atomic \
 		--namespace prow \
 		--values values.yaml 	 
  ``` 
