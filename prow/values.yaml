@@ -164,3 +164,17 @@ ghproxy:
 
 monitoring:
   enabled: true
+
+needsRetitle:
+  enabled: false
+  image:
+    repository: quay.io/ouzi/needs-retitle
+    tag: v1.0.0
+    pullPolicy: IfNotPresent
+  replicas: 1
+  tolerations:
+    - key: cloud.google.com/gke-preemptible
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+      

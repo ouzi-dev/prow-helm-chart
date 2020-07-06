@@ -1,0 +1,56 @@
+{{- if .Values.needsRetitle.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: needs-retitle
+  labels:
+    app: needs-retitle
+spec:
+  replicas: {{ .Values.needsRetitle.replicas }}
+  selector:
+    matchLabels:
+      app: needs-retitle
+  template:
+    metadata:
+      labels:
+        app: needs-retitle
+    spec:
+      terminationGracePeriodSeconds: 180
+{{- if .Values.needsRetitle.tolerations }}
+      tolerations:
+{{ toYaml .Values.needsRetitle.tolerations | indent 8 }}
+{{- end }}
+      containers:
+      - name: needs-retitle
+        image: {{ .Values.needsRetitle.image.repository}}:{{ .Values.needsRetitle.image.tag}}
+        imagePullPolicy: {{ .Values.needsRetitle.image.pullPolicy }}
+        args:
+        - --dry-run=false
+        - --github-endpoint=http://ghproxy
+        - --github-endpoint=https://api.github.com
+        - --github-token-path=/etc/github/oauth
+        ports:
+          - name: http
+            containerPort: 8888
+            protocol: TCP
+        volumeMounts:
+        - name: hmac
+          mountPath: /etc/webhook
+          readOnly: true
+        - name: oauth
+          mountPath: /etc/github
+          readOnly: true
+        - name: plugins
+          mountPath: /etc/plugins
+          readOnly: true
+      volumes:
+      - name: hmac
+        secret:
+          secretName: hmac-token
+      - name: oauth
+        secret:
+          secretName: {{ .Values.secrets.githubToken }}
+      - name: plugins
+        configMap:
+          name: plugins
+{{- end }}
