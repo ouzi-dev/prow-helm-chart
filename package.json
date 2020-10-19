@@ -12,7 +12,7 @@
     "@semantic-release/github": "^7.0.7",
     "@semantic-release/release-notes-generator": "^9.0.1",
     "fstream": "^1.0.12",
-    "semantic-release": "^17.1.1",
+    "semantic-release": "^17.2.1",
     "tar": "^6.0.2",
     "env-ci": "5.0.2",
     "minimist": "^1.2.5"
