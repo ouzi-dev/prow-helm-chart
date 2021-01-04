@@ -2,36 +2,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: plank
+  name: prow-controller-manager
   labels:
-    app: plank
+    app: prow-controller-manager
 spec:
   replicas: 1 # Do not scale up.
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: plank
+      app: prow-controller-manager
   template:
     metadata:
       labels:
-        app: plank
+        app: prow-controller-manager
     spec:
-      serviceAccountName: "plank"
-{{- if .Values.plank.tolerations }}
+      serviceAccountName: "prow-controller-manager"
+{{- if .Values.prow-controller-manager.tolerations }}
       tolerations:
-{{ toYaml .Values.plank.tolerations | indent 8 }}
+{{ toYaml .Values.prow-controller-manager.tolerations | indent 8 }}
 {{- end }}
       containers:
-      - name: plank
-        image: {{ quote .Values.plank.image }}
+      - name: prow-controller-manager
+        image: {{ quote .Values.prow-controller-manager.image }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
-        - --skip-report=true
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-token-path=/etc/github/oauth
+        - --enable-controller=plank
         - --job-config-path=/etc/job-config
         ports:
           - name: metrics
