@@ -24,7 +24,8 @@ spec:
       - name: crier
         image: {{ .Values.crier.image }}
         args:
-        - --github-workers=1
+        - --github-workers=10
+        - --blob-storage-workers=10
 {{ if .Values.secrets.slackToken }}
         - --slack-workers=1
         - --slack-token-file=/etc/slack/token
@@ -35,6 +36,7 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-token-path=/etc/github/oauth
+        - --gcs-credentials-file=/etc/gcs-credentials/service-account.json
         volumeMounts:
         - name: config
           mountPath: /etc/config
@@ -44,6 +46,9 @@ spec:
           readOnly: true
         - name: oauth
           mountPath: /etc/github
+          readOnly: true
+        - name: gcs-credentials
+          mountPath: /etc/gcs-credentials
           readOnly: true
 {{ if .Values.secrets.slackToken }}
         - name: slack
@@ -60,6 +65,9 @@ spec:
       - name: oauth
         secret:
           secretName: {{ .Values.secrets.githubToken }}
+      - name: gcs-credentials
+        secret:
+          secretName: {{ .Values.secrets.bucketGcsCredentials }}
 {{ if .Values.secrets.slackToken }}
       - name: slack
         secret:
