@@ -18,13 +18,13 @@ spec:
         app: prow-controller-manager
     spec:
       serviceAccountName: "prow-controller-manager"
-{{- if .Values.prow-controller-manager.tolerations }}
+{{- if .Values.prowcontrollermanager.tolerations }}
       tolerations:
-{{ toYaml .Values.prow-controller-manager.tolerations | indent 8 }}
+{{ toYaml .Values.prowcontrollermanager.tolerations | indent 8 }}
 {{- end }}
       containers:
       - name: prow-controller-manager
-        image: {{ quote .Values.prow-controller-manager.image }}
+        image: {{ quote .Values.prowcontrollermanager.image }}
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
