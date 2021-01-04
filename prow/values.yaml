@@ -28,8 +28,8 @@ hook:
       value: "true"
       effect: NoSchedule
 
-plank:
-  image: gcr.io/k8s-prow/plank:v20201228-15d664642a
+prow-controller-manager:
+  image: gcr.io/k8s-prow/prow-controller-manager:v20201228-15d664642a
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
