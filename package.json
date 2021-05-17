@@ -14,7 +14,7 @@
     "env-ci": "5.0.2",
     "fstream": "^1.0.12",
     "minimist": "^1.2.5",
-    "semantic-release": "^17.3.1",
+    "semantic-release": "^17.4.3",
     "tar": "^6.0.5"
   },
   "release": {
