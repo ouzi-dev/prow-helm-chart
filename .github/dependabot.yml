@@ -1,0 +1,36 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 99
+  ignore:
+  - dependency-name: npm
+    versions:
+    - 7.10.0
+    - 7.4.3
+    - 7.5.0
+    - 7.5.2
+    - 7.5.4
+    - 7.6.0
+    - 7.6.1
+    - 7.6.3
+    - 7.7.5
+    - 7.8.0
+    - 7.9.0
+  - dependency-name: npm-check-updates
+    versions:
+    - 11.0.2
+    - 11.1.1
+    - 11.1.4
+    - 11.1.9
+    - 11.2.0
+    - 11.3.0
+    - 11.4.1
+  - dependency-name: semantic-release
+    versions:
+    - 17.3.7
+    - 17.3.9
+    - 17.4.0
+    - 17.4.1
