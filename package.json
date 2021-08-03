@@ -15,7 +15,7 @@
     "fstream": "^1.0.12",
     "minimist": "^1.2.5",
     "semantic-release": "^17.4.3",
-    "tar": "^6.1.0"
+    "tar": "^6.1.2"
   },
   "release": {
     "plugins": [
