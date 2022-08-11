@@ -8,7 +8,11 @@ metadata:
 spec:
   replicas: 1 # Do not scale up.
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app: prow-controller-manager
@@ -28,6 +32,7 @@ spec:
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
+        # maybe remove gh stuff?
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-token-path=/etc/github/oauth

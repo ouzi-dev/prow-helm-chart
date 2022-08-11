@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: deck
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClass }}
+  rules:
+    - host: {{ quote .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: deck
+                port:
+                  number: 80
+          - path: /hook
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: hook
+                port:
+                  number: 8888
+          - path: /metrics
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: pushgateway-external
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - {{ quote .Values.ingress.host }}
+      secretName: {{ quote .Values.ingress.host }}
