@@ -21,6 +21,9 @@ ingress:
     ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/auth-url: "https://oauth2.test-infra.ouzi.io/oauth2/auth"
     nginx.ingress.kubernetes.io/auth-signin: "https://oauth2.test-infra.ouzi.io/oauth2/start?rd=/redirect/$http_host$request_uri"
+  hookAnnotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/ssl-redirect: "true"
 hook:
   image: gcr.io/k8s-prow/hook:v20220810-4ab15cddef
   replicas: 1

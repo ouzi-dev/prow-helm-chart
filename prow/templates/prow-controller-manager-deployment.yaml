@@ -32,7 +32,6 @@ spec:
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
-        # maybe remove gh stuff?
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-token-path=/etc/github/oauth
