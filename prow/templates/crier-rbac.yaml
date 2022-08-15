@@ -34,7 +34,7 @@ rules:
     - "list"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: crier-namespaced
 roleRef:
@@ -46,7 +46,7 @@ subjects:
   name: "crier"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: crier-namespaced
   namespace: {{ .Values.podNamespace }}

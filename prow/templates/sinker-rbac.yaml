@@ -4,7 +4,7 @@ metadata:
   name: "sinker"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "sinker"
 rules:
@@ -17,6 +17,21 @@ rules:
       - list
       - watch
       - get
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    resourceNames:
+      - prow-sinker-leaderlock
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
   - apiGroups:
       - ""
     resources:
@@ -35,7 +50,7 @@ rules:
       - create
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   namespace: {{ .Values.podNamespace }}
   name: "sinker"
@@ -47,9 +62,12 @@ rules:
     verbs:
       - delete
       - list
+      - watch
+      - get
+      - patch
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "sinker"
 roleRef:
@@ -61,7 +79,7 @@ subjects:
   name: "sinker"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   namespace: {{ .Values.podNamespace }}
   name: "sinker"

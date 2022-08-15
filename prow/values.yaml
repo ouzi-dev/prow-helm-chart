@@ -13,15 +13,20 @@ github:
   bot:
     username: ouzibot
 
+ingress:
+  ingressClass: nginx
+  host: prow.test-infra.ouzi.io
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/auth-url: "https://oauth2.test-infra.ouzi.io/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://oauth2.test-infra.ouzi.io/oauth2/start?rd=/redirect/$http_host$request_uri"
+  hookAnnotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/ssl-redirect: "true"
 hook:
-  image: gcr.io/k8s-prow/hook:v20201228-15d664642a
+  image: gcr.io/k8s-prow/hook:v20220810-4ab15cddef
   replicas: 1
-  ingress:
-    host: prow.test-infra.ouzi.io
-    annotations: 
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      ingress.kubernetes.io/ssl-redirect: "true"
-      kubernetes.io/ingress.class: nginx  
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -29,7 +34,7 @@ hook:
       effect: NoSchedule
 
 prowcontrollermanager:
-  image: gcr.io/k8s-prow/prow-controller-manager:v20201228-15d664642a
+  image: gcr.io/k8s-prow/prow-controller-manager:v20220810-4ab15cddef
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -37,7 +42,7 @@ prowcontrollermanager:
       effect: NoSchedule
 
 sinker:
-  image: gcr.io/k8s-prow/sinker:v20201228-15d664642a
+  image: gcr.io/k8s-prow/sinker:v20220810-4ab15cddef
   replicas: 1
   tolerations:
     - key: cloud.google.com/gke-preemptible
@@ -46,16 +51,8 @@ sinker:
       effect: NoSchedule
 
 deck:
-  image: gcr.io/k8s-prow/deck:v20201228-15d664642a
+  image: gcr.io/k8s-prow/deck:v20220810-4ab15cddef
   replicas: 1
-  ingress:
-    host: prow.test-infra.ouzi.io
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      ingress.kubernetes.io/ssl-redirect: "true"
-      kubernetes.io/ingress.class: nginx
-      nginx.ingress.kubernetes.io/auth-url: "https://oauth2.test-infra.ouzi.io/oauth2/auth"
-      nginx.ingress.kubernetes.io/auth-signin: "https://oauth2.test-infra.ouzi.io/oauth2/start?rd=/redirect/$http_host$request_uri"
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -63,7 +60,7 @@ deck:
       effect: NoSchedule
 
 horologium:
-  image: gcr.io/k8s-prow/horologium:v20201228-15d664642a
+  image: gcr.io/k8s-prow/horologium:v20220810-4ab15cddef
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -71,7 +68,7 @@ horologium:
       effect: NoSchedule
 
 tide:
-  image: gcr.io/k8s-prow/tide:v20201228-15d664642a
+  image: gcr.io/k8s-prow/tide:v20220810-4ab15cddef
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -79,7 +76,7 @@ tide:
       effect: NoSchedule
 
 statusreconciler:
-  image: gcr.io/k8s-prow/status-reconciler:v20201228-15d664642a
+  image: gcr.io/k8s-prow/status-reconciler:v20220810-4ab15cddef
   replicas: 1
   tolerations:
     - key: cloud.google.com/gke-preemptible
@@ -88,7 +85,7 @@ statusreconciler:
       effect: NoSchedule
 
 needsrebase:
-  image: gcr.io/k8s-prow/needs-rebase:v20201228-15d664642a
+  image: gcr.io/k8s-prow/needs-rebase:v20220810-4ab15cddef
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -96,7 +93,7 @@ needsrebase:
       effect: NoSchedule
 
 branchprotector:
-  image: gcr.io/k8s-prow/branchprotector:v20201228-15d664642a
+  image: gcr.io/k8s-prow/branchprotector:v20220810-4ab15cddef
   schedule: 12 * * * * # Every hour at 12 minutes past the hour
   tolerations:
     - key: cloud.google.com/gke-preemptible
@@ -105,7 +102,7 @@ branchprotector:
       effect: NoSchedule
 
 crier:
-  image: gcr.io/k8s-prow/crier:v20201228-15d664642a
+  image: gcr.io/k8s-prow/crier:v20220810-4ab15cddef
   replicas: 1
   tolerations:
     - key: cloud.google.com/gke-preemptible
@@ -114,7 +111,7 @@ crier:
       effect: NoSchedule
 
 labelsync:
-  image: gcr.io/k8s-prow/label_sync:v20201228-15d664642a
+  image: gcr.io/k8s-prow/label_sync:v20220810-4ab15cddef
   schedule: 0 5 * * * # Every day at 5AM
   tolerations:
     - key: cloud.google.com/gke-preemptible
@@ -125,8 +122,8 @@ labelsync:
 # requires tekton to work - 
 # we will install it part of the chart in a later revision
 pipeline:
-  # image: gcr.io/k8s-prow/pipeline:v20201228-15d664642a
-  image: gcr.io/k8s-prow/pipeline:v20201228-15d664642a
+  # image: gcr.io/k8s-prow/pipeline:v20220810-4ab15cddef
+  image: gcr.io/k8s-prow/pipeline:v20220810-4ab15cddef
   tolerations:
     - key: cloud.google.com/gke-preemptible
       operator: Equal
@@ -151,7 +148,7 @@ pushgateway:
         effect: NoSchedule
 
 ghproxy:
-  image: gcr.io/k8s-prow/ghproxy:v20201228-15d664642a
+  image: gcr.io/k8s-prow/ghproxy:v20220810-4ab15cddef
   replicas: 1
   cache:
     sizeGB: 19

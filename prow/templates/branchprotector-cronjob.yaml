@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: branchprotector
@@ -25,8 +25,7 @@ spec:
             - --github-endpoint=http://ghproxy
             - --github-endpoint=https://api.github.com
             - --github-token-path=/etc/github/oauth
-            - --confirm=true
-            - --github-endpoint=http://ghproxy
+            - --confirm
             volumeMounts:
             - name: oauth
               mountPath: /etc/github
