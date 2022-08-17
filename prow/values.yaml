@@ -166,7 +166,7 @@ needsRetitle:
   enabled: false
   image:
     repository: quay.io/ouzi/needs-retitle
-    tag: v1.2.1
+    tag: v1.3.0
     pullPolicy: IfNotPresent
   replicas: 1
   tolerations:
