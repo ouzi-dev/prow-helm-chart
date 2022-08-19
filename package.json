@@ -13,7 +13,7 @@
     "@semantic-release/release-notes-generator": "^9.0.2",
     "env-ci": "5.0.2",
     "fstream": "^1.0.12",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "semantic-release": "^17.4.3",
     "tar": "^6.1.0"
   },
